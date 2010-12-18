@@ -14,9 +14,15 @@ use Storable qw(nstore retrieve);
 
 my $base = getcwd();
 my $rel_paths = 1;
-my $read_size = (2 ** 20) * 10; # 10 MiB
+my $read_size = (2 ** 20) * 4; # 4 MiB
 
 my $db;
+
+my $action = $ARGV[0];
+
+if (not defined $action) {
+	die("Usage: $0 <action>\n");
+}
 
 if (-r 'hashl.db') {
 	$db = retrieve('hashl.db');
@@ -63,9 +69,16 @@ sub process_file {
 	};
 }
 
-find(\&process_file, $base);
-
-nstore($db, 'hashl.db');
+if ($action eq 'update') {
+	find(\&process_file, $base);
+	nstore($db, 'hashl.db');
+}
+elsif ($action eq 'list') {
+	for my $name (sort keys %{$db}) {
+		my $file = $db->{$name};
+		printf("%s %s\n", $file->{'hash'}, $name);
+	}
+}
 
 __END__
 

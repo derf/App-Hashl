@@ -10,13 +10,21 @@ use autodie;
 use Cwd;
 use Digest::SHA qw(sha1_hex);
 use File::Find;
+use Getopt::Long;
 use Storable qw(nstore retrieve);
 
 my $base = getcwd();
 my $rel_paths = 1;
 my $read_size = (2 ** 20) * 4; # 4 MiB
+my $db_file = "$base/hashl.db";
+my $total = 0;
+my $cur = 0;
 
 my $db;
+
+GetOptions(
+	'd|database=s' => \$db_file,
+);
 
 my $action = $ARGV[0];
 
@@ -24,16 +32,29 @@ if (not defined $action) {
 	die("Usage: $0 <action>\n");
 }
 
-if (-r 'hashl.db') {
-	$db = retrieve('hashl.db');
+if (-r $db_file) {
+	$db = retrieve($db_file);
 }
 
 sub print_status {
 	my ($file) = @_;
 	local $| = 1;
 
-	print "\r\e[2K${file}";
+	printf(
+		"\r\e[2K%d/%d %s",
+		$cur,
+		$total,
+		$file,
+	);
 }
+
+sub get_total {
+	my $file = $File::Find::name;
+	if (-f $file and $file ne $db_file) {
+		$total++;
+	}
+}
+
 
 sub process_file {
 	my $file = $File::Find::name;
@@ -41,9 +62,11 @@ sub process_file {
 	my ($size, $mtime) = (stat($file))[7,9];
 	my ($fh, $data);
 
-	if (not -f $file or $file eq "${base}/hashl.db") {
+	if (not -f $file or $file eq $db_file) {
 		return;
 	}
+
+	$cur++;
 
 	if ($rel_paths) {
 		$file = substr($file, length($base) + 1);
@@ -67,11 +90,16 @@ sub process_file {
 		mtime => $mtime,
 		size => $size,
 	};
+
+	if (($cur % 100) == 0) {
+		nstore($db, $db_file);
+	}
 }
 
 if ($action eq 'update') {
+	find(\&get_total, $base);
 	find(\&process_file, $base);
-	nstore($db, 'hashl.db');
+	nstore($db, $db_file);
 }
 elsif ($action eq 'list') {
 	for my $name (sort keys %{$db}) {

@@ -8,7 +8,7 @@ use 5.010;
 use autodie;
 
 use Cwd;
-use Digest::MD5 qw(md5_hex);
+use Digest::SHA qw(sha1_hex);
 use File::Find;
 use Storable qw(nstore retrieve);
 
@@ -20,6 +20,13 @@ my $db;
 
 if (-r 'hashl.db') {
 	$db = retrieve('hashl.db');
+}
+
+sub print_status {
+	my ($file) = @_;
+	local $| = 1;
+
+	print "\r\e[2K${file}";
 }
 
 sub process_file {
@@ -36,6 +43,8 @@ sub process_file {
 		$file = substr($file, length($base) + 1);
 	}
 
+	print_status($file);
+
 	if (exists($db->{$file}) and
 			$db->{$file}->{'mtime'} == $mtime and
 			$db->{$file}->{'size'} == $size ) {
@@ -48,12 +57,10 @@ sub process_file {
 	close($fh);
 
 	$db->{$file} = {
-		hash => md5_hex($data),
+		hash => sha1_hex($data),
 		mtime => $mtime,
 		size => $size,
 	};
-
-	printf("%s %s\n", $db->{$file}->{'hash'}, $file);
 }
 
 find(\&process_file, $base);

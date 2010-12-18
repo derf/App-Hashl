@@ -12,6 +12,7 @@ use Digest::SHA qw(sha1_hex);
 use File::Find;
 use Getopt::Long;
 use Storable qw(nstore retrieve);
+use Time::Progress;
 
 my $base = getcwd();
 my $rel_paths = 1;
@@ -19,6 +20,7 @@ my $read_size = (2 ** 20) * 4; # 4 MiB
 my $db_file = "$base/hashl.db";
 my $total = 0;
 my $cur = 0;
+my $timer;
 
 my $db;
 
@@ -36,18 +38,6 @@ if (-r $db_file) {
 	$db = retrieve($db_file);
 }
 
-sub print_status {
-	my ($file) = @_;
-	local $| = 1;
-
-	printf(
-		"\r\e[2K%d/%d %s",
-		$cur,
-		$total,
-		$file,
-	);
-}
-
 sub get_total {
 	my $file = $File::Find::name;
 	if (-f $file and $file ne $db_file) {
@@ -55,12 +45,13 @@ sub get_total {
 	}
 }
 
-
 sub process_file {
 	my $file = $File::Find::name;
 	my $path = $file;
 	my ($size, $mtime) = (stat($file))[7,9];
 	my ($fh, $data);
+
+	local $| = 1;
 
 	if (not -f $file or $file eq $db_file) {
 		return;
@@ -72,7 +63,7 @@ sub process_file {
 		$file = substr($file, length($base) + 1);
 	}
 
-	print_status($file);
+	print $timer->report("\r\e[2KUpdating: %p done, %L elapsed, %E remaining", $cur);
 
 	if (exists($db->{$file}) and
 			$db->{$file}->{'mtime'} == $mtime and
@@ -98,6 +89,13 @@ sub process_file {
 
 if ($action eq 'update') {
 	find(\&get_total, $base);
+
+	$timer = Time::Progress->new();
+	$timer->attr(
+		min => 1,
+		max => $total
+	);
+
 	find(\&process_file, $base);
 	nstore($db, $db_file);
 }

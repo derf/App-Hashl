@@ -17,7 +17,7 @@ use Time::Progress;
 my $base = getcwd();
 my $rel_paths = 1;
 my $read_size = (2 ** 20) * 4; # 4 MiB
-my $db_file = "$base/hashl.db";
+my $db_file = "$base/.hashl.db";
 my $total = 0;
 my $cur = 0;
 my $timer;

@@ -45,11 +45,31 @@ sub get_total {
 	}
 }
 
+sub drop_deleted {
+	for my $file (keys %{$db}) {
+		if (! -e $file) {
+			delete $db->{$file};
+		}
+	}
+}
+
+sub hash_file {
+	my ($file) = @_;
+	my ($fh, $data);
+
+	open($fh, '<', $file);
+	binmode($fh);
+	read($fh, $data, $read_size);
+	close($fh);
+
+	return sha1_hex($data);
+}
+
+
 sub process_file {
 	my $file = $File::Find::name;
 	my $path = $file;
 	my ($size, $mtime) = (stat($file))[7,9];
-	my ($fh, $data);
 
 	local $| = 1;
 
@@ -71,13 +91,8 @@ sub process_file {
 		return;
 	}
 
-	open($fh, '<', $path);
-	binmode($fh);
-	read($fh, $data, $read_size);
-	close($fh);
-
 	$db->{$file} = {
-		hash => sha1_hex($data),
+		hash => hash_file($path),
 		mtime => $mtime,
 		size => $size,
 	};
@@ -88,6 +103,8 @@ sub process_file {
 }
 
 if ($action eq 'update') {
+
+	drop_deleted();
 	find(\&get_total, $base);
 
 	$timer = Time::Progress->new();
@@ -97,6 +114,7 @@ if ($action eq 'update') {
 	);
 
 	find(\&process_file, $base);
+	print "\n";
 	nstore($db, $db_file);
 }
 elsif ($action eq 'list') {

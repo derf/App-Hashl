@@ -53,7 +53,7 @@ else {
 
 sub get_total {
 	my $file = $File::Find::name;
-	if (-f $file and $file ne $db_file) {
+	if (-f $file and not -l $file and $file ne $db_file) {
 		$total++;
 	}
 }
@@ -78,14 +78,21 @@ sub hash_file {
 	return sha1_hex($data);
 }
 
-sub is_in_list {
-	my ($file) = @_;
-	my $hash = hash_file($file);
+sub hash_in_db {
+	my ($hash) = @_;
 
-	if (grep { $_->{'hash'} eq $hash } values %{$db->{'files'}}) {
-		return 1;
+	while (my ($name, $file) = each(%{$db->{'files'}})) {
+		if ($file->{'hash'} eq $hash) {
+			return $name;
+		}
 	}
-	return 0;
+	return undef;
+}
+
+sub file_in_db {
+	my ($file) = @_;
+
+	return hash_in_db(hash_file($file));
 }
 
 sub db_info {
@@ -103,7 +110,7 @@ sub process_file {
 
 	local $| = 1;
 
-	if (not -f $file or $file eq $db_file) {
+	if (not -f $file or -l $file or $file eq $db_file) {
 		return;
 	}
 
@@ -153,14 +160,23 @@ elsif ($action eq 'list') {
 		printf("%s %s\n", $file->{'hash'}, $name);
 	}
 }
-elsif ($action eq 'in-list') {
+elsif ($action ~~ [qw[know-file know-hash new-file new-hash]]) {
 	if ($ARGV[1]) {
-		exit (!is_in_list($ARGV[1]));
+		given ($action) {
+			when ('know-file') { exit (not defined file_in_db($ARGV[1])) }
+			when ('know-hash') { exit (not defined hash_in_db($ARGV[1])) }
+			when ('new-file') { exit (defined file_in_db($ARGV[1])) }
+			when ('new-hash') { exit (defined hash_in_db($ARGV[1])) }
+		}
 	}
 	else {
 		while (my $line = <STDIN>) {
 			chomp $line;
-			if (!is_in_list($line)) {
+			if (
+					($action eq 'know-file' and     file_in_db($line)) or
+					($action eq 'know-hash' and     hash_in_db($line)) or
+					($action eq  'new-file' and not file_in_db($line)) or
+					($action eq  'new-hash' and not hash_in_db($line))) {
 				say $line;
 			}
 		}

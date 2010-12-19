@@ -209,6 +209,48 @@ None, so far
 
 Unknown.  This is alpha software.
 
+=head1 EXAMPLES
+
+=head2 LEECHING
+
+First, create a database of your local files:
+
+C<< cd /media/videos; hashl update >>
+
+Now, assume you have a (possibly slow) external share mounted at
+F</tmp/mnt/ext>.  You do not want to copy all files to your disk and then use
+B<fdupes> or similar to weed out the duplicates.  Since you just used B<hashl>
+to create a database with the hashes of the first 4MB of all your files, you
+can now use it to check if you (very probably) already have any remote file.
+For that, you only need to leech the first 4MB of every file on the share, and
+not the whole file.  For example:
+
+C<< for f (/tmp/mnt/ext/**/*(.)); hashl in-list $f || cp -i $f
+/media/videos/incoming/ >>
+
+=head2 EXTERNAL HARD DISK
+
+Personally, I have all my videos on an external hard disk, which I usually do
+not carry with me.  So, when I get new videos, I put them into F<~/lib/videos>
+on my netboo, and then later copy them to the external disk.  Of course, it
+can always happen that I get a movie I already have, or forget to move
+something from F<~/lib/videos> to the external disk, especially since I also
+always have some stuff from the disk in F<~/lib/videos>.
+
+However, I can use B<hashl> to conveniently solve this issue.  Run
+periodically:
+
+C<< cd /media/argon; hashl -d ~/lib/video/.argon update >>
+
+Now, I always have a list of files on the external disk with me.  When I get a
+new file:
+
+C<< hashl -d ~/lib/video/.argon in-list $file >>
+
+And to find out which files are not on the external disk:
+
+C<< cd ~/lib/video; print -l **/*(.) | hashl -d .argon in-list >>
+
 =head1 AUTHOR
 
 Copyright (C) 2010 by Daniel Friesel E<lt>derf@finalrewind.orgE<gt>

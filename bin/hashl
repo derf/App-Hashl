@@ -65,6 +65,16 @@ sub hash_file {
 	return sha1_hex($data);
 }
 
+sub is_in_list {
+	my ($file) = @_;
+	my $hash = hash_file($file);
+
+	if (grep { $_->{'hash'} eq $hash } values %{$db}) {
+		return 1;
+	}
+	return 0;
+}
+
 
 sub process_file {
 	my $file = $File::Find::name;
@@ -121,6 +131,19 @@ elsif ($action eq 'list') {
 	for my $name (sort keys %{$db}) {
 		my $file = $db->{$name};
 		printf("%s %s\n", $file->{'hash'}, $name);
+	}
+}
+elsif ($action eq 'in-list') {
+	if ($ARGV[1]) {
+		exit (!is_in_list($ARGV[1]));
+	}
+	else {
+		while (my $line = <STDIN>) {
+			chomp $line;
+			if (!is_in_list($line)) {
+				say $line;
+			}
+		}
 	}
 }
 

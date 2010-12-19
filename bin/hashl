@@ -22,6 +22,8 @@ my $total = 0;
 my $cur = 0;
 my $timer;
 
+my $VERSION = '0.1';
+
 my $db;
 
 GetOptions(

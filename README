@@ -1,0 +1,19 @@
+hashl - Hash parts of files, use that for duplicate avoidance
+
+Requires:
+ - perl version 5.10 or newer
+ - The perl modules Digest::SHA and Time::Progress
+
+Installation
+
+> perl Build.PL
+> ./Build
+> ./Build test
+> sudo ./Build install
+
+See also the Module::Build documentation.
+
+Extra modules required for testing:
+ - Test::Compile
+ - Test::More
+ - Test::Pod

@@ -27,7 +27,8 @@ my $VERSION = '0.1';
 my $db;
 
 GetOptions(
-	'd|database=s' => \$db_file,
+	'd|database=s'  => \$db_file,
+	's|read-size=d' => sub { $read_size = $_[0] * 1024 },
 );
 
 if (substr($db_file, 0, 1) ne '/') {

@@ -28,7 +28,7 @@ my $db;
 
 GetOptions(
 	'd|database=s'  => \$db_file,
-	's|read-size=d' => sub { $read_size = $_[0] * 1024 },
+	's|read-size=i' => sub { $read_size = $_[1] * 1024 },
 );
 
 if (substr($db_file, 0, 1) ne '/') {
@@ -43,6 +43,12 @@ if (not defined $action) {
 
 if (-r $db_file) {
 	$db = retrieve($db_file);
+	$read_size = $db->{'config'}->{'read_size'};
+}
+else {
+	$db->{'config'} = {
+		read_size => $read_size,
+	}
 }
 
 sub get_total {
@@ -53,9 +59,9 @@ sub get_total {
 }
 
 sub drop_deleted {
-	for my $file (keys %{$db}) {
+	for my $file (keys %{$db->{'files'}}) {
 		if (! -e $file) {
-			delete $db->{$file};
+			delete $db->{'files'}->{$file};
 		}
 	}
 }
@@ -76,12 +82,19 @@ sub is_in_list {
 	my ($file) = @_;
 	my $hash = hash_file($file);
 
-	if (grep { $_->{'hash'} eq $hash } values %{$db}) {
+	if (grep { $_->{'hash'} eq $hash } values %{$db->{'files'}}) {
 		return 1;
 	}
 	return 0;
 }
 
+sub db_info {
+	printf(
+		"Read size: %d bytes (%.f KiB)\n",
+		$db->{'config'}->{'read_size'},
+		$db->{'config'}->{'read_size'} / 1024,
+	);
+}
 
 sub process_file {
 	my $file = $File::Find::name;
@@ -102,13 +115,13 @@ sub process_file {
 
 	print $timer->report("\r\e[2KUpdating: %p done, %L elapsed, %E remaining", $cur);
 
-	if (exists($db->{$file}) and
-			$db->{$file}->{'mtime'} == $mtime and
-			$db->{$file}->{'size'} == $size ) {
+	if (exists($db->{'files'}->{$file}) and
+			$db->{'files'}->{$file}->{'mtime'} == $mtime and
+			$db->{'files'}->{$file}->{'size'} == $size ) {
 		return;
 	}
 
-	$db->{$file} = {
+	$db->{'files'}->{$file} = {
 		hash => hash_file($path),
 		mtime => $mtime,
 		size => $size,
@@ -135,8 +148,8 @@ if ($action eq 'update') {
 	nstore($db, $db_file);
 }
 elsif ($action eq 'list') {
-	for my $name (sort keys %{$db}) {
-		my $file = $db->{$name};
+	for my $name (sort keys %{$db->{'files'}}) {
+		my $file = $db->{'files'}->{$name};
 		printf("%s %s\n", $file->{'hash'}, $name);
 	}
 }
@@ -152,6 +165,9 @@ elsif ($action eq 'in-list') {
 			}
 		}
 	}
+}
+elsif ($action eq 'info') {
+	db_info();
 }
 
 __END__

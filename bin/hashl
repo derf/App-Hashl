@@ -220,9 +220,15 @@ directory.
 
 =over
 
-=item B<-d> I<dbfile>
+=item B<-d>|B<--database> I<dbfile>
 
 Use I<dbfile> instead of F<.hashl.db>
+
+=item B<-s>|B<--read-size> I<bytes>
+
+Change size of the part of each file which is hashed.  By default, B<hashl>
+hashes the first 4 MiB.  Note that this option only makes sense for C<< hashl
+update >> to create a new database.
 
 =back
 

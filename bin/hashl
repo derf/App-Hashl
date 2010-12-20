@@ -30,7 +30,7 @@ my $db;
 GetOptions(
 	'd|database=s'  => \$db_file,
 	's|read-size=i' => sub { $read_size = $_[1] * 1024 },
-);
+) or usage();
 
 if (substr($db_file, 0, 1) ne '/') {
 	$db_file = "${base}/${db_file}";
@@ -38,8 +38,16 @@ if (substr($db_file, 0, 1) ne '/') {
 
 my $action = $ARGV[0];
 
+sub usage {
+	die(<<"EOF");
+Usage: $0 [options] <update|list|info|...> [args]
+See 'perldoc -F $0' (or 'man $0' if it is properly installed)
+EOF
+
+}
+
 if (not defined $action) {
-	die("Usage: $0 <action>\n");
+	usage();
 }
 
 if (-r $db_file) {
@@ -206,6 +214,9 @@ elsif ($action eq 'info') {
 		db_info();
 	}
 }
+else {
+	usage();
+}
 
 __END__
 
@@ -215,7 +226,7 @@ B<hashl> - Create database with partial file hashes, check if other files are in
 
 =head1 SYNOPSIS
 
-B<hashl> [B<-d> I<dbfile>] I<action> [I<args>]
+B<hashl> [B<-d> I<dbfile>] [B<-s> I<read-size>] I<action> [I<args>]
 
 =head1 DESCRIPTION
 

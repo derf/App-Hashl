@@ -103,6 +103,17 @@ sub db_info {
 	);
 }
 
+sub file_info {
+	my ($file) = @_;
+
+	printf(
+		"File: %s\nSize: %d bytes\nHash: %s\n",
+		$file,
+		$db->{'files'}->{$file}->{'size'},
+		$db->{'files'}->{$file}->{'hash'},
+	);
+}
+
 sub process_file {
 	my $file = $File::Find::name;
 	my $path = $file;
@@ -183,7 +194,12 @@ elsif ($action ~~ [qw[know-file know-hash new-file new-hash]]) {
 	}
 }
 elsif ($action eq 'info') {
-	db_info();
+	if ($ARGV[1]) {
+		file_info($ARGV[1]);
+	}
+	else {
+		db_info();
+	}
 }
 
 __END__
@@ -208,6 +224,10 @@ Checks if I<file> is in the database.  Returns 0 if it is, 1 otherwise.
 
 If I<file> is not specified, B<hashl> reads filenames from stdin and returns
 those which are not already in the database.
+
+=item B<info> [I<file>]
+
+Show information I<file> (or the database, if I<file> is not specified).
 
 =item B<update>
 

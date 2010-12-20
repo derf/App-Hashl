@@ -11,6 +11,7 @@ use Cwd;
 use Digest::SHA qw(sha1_hex);
 use File::Find;
 use Getopt::Long;
+use IO::Handle;
 use Storable qw(nstore retrieve);
 use Time::Progress;
 
@@ -95,6 +96,29 @@ sub file_in_db {
 	return hash_in_db(hash_file($file));
 }
 
+sub db_find {
+	if ($ARGV[1]) {
+		given ($action) {
+			when ('know-file') { exit (not defined file_in_db($ARGV[1])) }
+			when ('know-hash') { exit (not defined hash_in_db($ARGV[1])) }
+			when ('new-file') { exit (defined file_in_db($ARGV[1])) }
+			when ('new-hash') { exit (defined hash_in_db($ARGV[1])) }
+		}
+	}
+	else {
+		while (my $line = <STDIN>) {
+			chomp $line;
+			if (
+					($action eq 'know-file' and     file_in_db($line)) or
+					($action eq 'know-hash' and     hash_in_db($line)) or
+					($action eq  'new-file' and not file_in_db($line)) or
+					($action eq  'new-hash' and not hash_in_db($line))) {
+				say $line;
+			}
+		}
+	}
+}
+
 sub db_info {
 	printf(
 		"Read size: %d bytes (%.f KiB)\n",
@@ -118,8 +142,6 @@ sub process_file {
 	my $file = $File::Find::name;
 	my $path = $file;
 	my ($size, $mtime) = (stat($file))[7,9];
-
-	local $| = 1;
 
 	if (not -f $file or -l $file or $file eq $db_file) {
 		return;
@@ -152,6 +174,8 @@ sub process_file {
 
 if ($action eq 'update') {
 
+	STDOUT->autoflush(1);
+
 	drop_deleted();
 	find(\&get_total, $base);
 
@@ -172,26 +196,7 @@ elsif ($action eq 'list') {
 	}
 }
 elsif ($action ~~ [qw[know-file know-hash new-file new-hash]]) {
-	if ($ARGV[1]) {
-		given ($action) {
-			when ('know-file') { exit (not defined file_in_db($ARGV[1])) }
-			when ('know-hash') { exit (not defined hash_in_db($ARGV[1])) }
-			when ('new-file') { exit (defined file_in_db($ARGV[1])) }
-			when ('new-hash') { exit (defined hash_in_db($ARGV[1])) }
-		}
-	}
-	else {
-		while (my $line = <STDIN>) {
-			chomp $line;
-			if (
-					($action eq 'know-file' and     file_in_db($line)) or
-					($action eq 'know-hash' and     hash_in_db($line)) or
-					($action eq  'new-file' and not file_in_db($line)) or
-					($action eq  'new-hash' and not hash_in_db($line))) {
-				say $line;
-			}
-		}
-	}
+	db_find();
 }
 elsif ($action eq 'info') {
 	if ($ARGV[1]) {

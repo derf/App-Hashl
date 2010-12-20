@@ -223,16 +223,37 @@ Actions:
 
 =over
 
-=item B<in-list> [I<file>]
-
-Checks if I<file> is in the database.  Returns 0 if it is, 1 otherwise.
-
-If I<file> is not specified, B<hashl> reads filenames from stdin and returns
-those which are not already in the database.
-
 =item B<info> [I<file>]
 
-Show information I<file> (or the database, if I<file> is not specified).
+Show information on I<file> (or the database, if I<file> is not specified).
+
+=item B<know-file> [I<file>]
+
+When I<file> is specified: Returns true if I<file> (judged by its hash) is
+already in the database, false otherwise.
+
+When used without further arguments: Reads filenames from stdin (one per line)
+and writes those to stdout which are already in the database.
+
+=item B<know-hash> [I<hash>]
+
+Like B<know-file>, but works with file hashes instead.
+
+=item B<list>
+
+List all files and their hashes.
+
+=item B<new-file> [I<file>]
+
+When I<file> is specified: Returns true if I<file> (judged by its hash) is not
+in the database, false otherwise.
+
+When used without further arguments: Reads filenames from stdin (one per line)
+and writes those to stdout which are not in the database.
+
+=item B<new-hash> [I<hash>]
+
+Like B<new-file>, but works with file hashes instead.
 
 =item B<update>
 
@@ -293,7 +314,7 @@ can now use it to check if you (very probably) already have any remote file.
 For that, you only need to leech the first 4MB of every file on the share, and
 not the whole file.  For example:
 
-C<< for f (/tmp/mnt/ext/**/*(.)); hashl in-list $f || cp -i $f
+C<< for f (/tmp/mnt/ext/**/*(.)); hashl new-file $f && cp -i $f
 /media/videos/incoming/ >>
 
 =head2 EXTERNAL HARD DISK
@@ -313,11 +334,11 @@ C<< cd /media/argon; hashl -d ~/lib/video/.argon update >>
 Now, I always have a list of files on the external disk with me.  When I get a
 new file:
 
-C<< hashl -d ~/lib/video/.argon in-list $file >>
+C<< hashl -d ~/lib/video/.argon new-file $file >>
 
 And to find out which files are not on the external disk:
 
-C<< cd ~/lib/video; print -l **/*(.) | hashl -d .argon in-list >>
+C<< cd ~/lib/video; print -l **/*(.) | hashl -d .argon new-file >>
 
 =head1 AUTHOR
 

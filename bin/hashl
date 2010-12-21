@@ -325,8 +325,8 @@ can now use it to check if you (very probably) already have any remote file.
 For that, you only need to leech the first 4MB of every file on the share, and
 not the whole file.  For example:
 
-C<< for f (/tmp/mnt/ext/**/*(.)); hashl new-file $f && cp -i $f
-/media/videos/incoming/ >>
+C<< for f (/tmp/mnt/ext/**/*(.)); hashl new-file $f && cp -v --parents $f
+/media/videos/incoming/ || echo skip $f >>
 
 =head2 EXTERNAL HARD DISK
 

@@ -90,7 +90,9 @@ sub hash_file {
 sub hash_in_db {
 	my ($hash) = @_;
 
-	while (my ($name, $file) = each(%{$db->{'files'}})) {
+	for my $name (keys %{$db->{'files'}}) {
+		my $file = $db->{'files'}->{$name};
+
 		if ($file->{'hash'} eq $hash) {
 			return $name;
 		}
@@ -117,10 +119,10 @@ sub db_find {
 		while (my $line = <STDIN>) {
 			chomp $line;
 			if (
-					($action eq 'know-file' and     file_in_db($line)) or
-					($action eq 'know-hash' and     hash_in_db($line)) or
-					($action eq  'new-file' and not file_in_db($line)) or
-					($action eq  'new-hash' and not hash_in_db($line))) {
+					($action eq 'know-file' and     defined file_in_db($line)) or
+					($action eq 'know-hash' and     defined hash_in_db($line)) or
+					($action eq  'new-file' and not defined file_in_db($line)) or
+					($action eq  'new-hash' and not defined hash_in_db($line))) {
 				say $line;
 			}
 		}

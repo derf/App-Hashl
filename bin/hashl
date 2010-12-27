@@ -9,6 +9,7 @@ use autodie;
 
 use Cwd;
 use Digest::SHA qw(sha1_hex);
+use File::Copy;
 use File::Find;
 use Getopt::Long;
 use IO::Handle;
@@ -22,6 +23,7 @@ my $db_file = '.hashl.db';
 my $total = 0;
 my $cur = 0;
 my $timer;
+my $incoming_dir;
 
 my $VERSION = '0.1';
 
@@ -182,6 +184,44 @@ sub process_file {
 	}
 }
 
+sub mkdirs {
+	my ($base, $new) = @_;
+
+	for my $dir (split(qr{/}, $new)) {
+		$base .= "/$dir";
+		if (! -d $base) {
+			mkdir($base);
+		}
+	}
+}
+
+sub copy_file {
+	my ($file, $to) = @_;
+
+	my $base = substr($file, length($base) + 1);
+	if ($base =~ s{ / [^/]+ $}{}x) {
+		mkdirs($incoming_dir, $base);
+	}
+
+	copy($file, "${to}/${base}");
+}
+
+sub maybe_copy_file {
+	my $file = $File::Find::name;
+
+	if (not -f $file or -l $file or $file eq $db_file) {
+		return;
+	}
+
+	$cur++;
+
+	print $timer->report("\r\e[KCopying: %p done, %L elapsed, %E remaining", $cur);
+
+	if (not defined file_in_db($file)) {
+		copy_file($file, $incoming_dir);
+	}
+}
+
 if ($action eq 'update') {
 
 	STDOUT->autoflush(1);
@@ -215,6 +255,29 @@ elsif ($action eq 'info') {
 	else {
 		db_info();
 	}
+}
+elsif ($action eq 'copy') {
+
+	if (not $ARGV[1]) {
+		usage();
+	}
+
+	$incoming_dir = $ARGV[1];
+	if (substr($incoming_dir, 0, 1) ne '/') {
+		$incoming_dir = $base . '/' . $incoming_dir;
+	}
+
+	STDOUT->autoflush(1);
+	find(\&get_total, $base);
+
+	$timer = Time::Progress->new();
+	$timer->attr(
+		min => 1,
+		max => $total,
+	);
+
+	find(\&maybe_copy_file, $base);
+	print "\n";
 }
 else {
 	usage();

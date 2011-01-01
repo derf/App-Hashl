@@ -22,6 +22,7 @@ my $read_size = (2 ** 20) * 4; # 4 MiB
 my $db_file = '.hashl.db';
 my $total = 0;
 my $cur = 0;
+my $show_progress = 1;
 my $timer;
 my $incoming_dir;
 my ($find_ref, $find_db_write);
@@ -34,6 +35,7 @@ STDOUT->autoflush(1);
 
 GetOptions(
 	'd|database=s'  => \$db_file,
+	'n|no-progress' => sub { $show_progress = 0 },
 	's|read-size=i' => sub { $read_size = $_[1] * 1024 },
 ) or usage();
 
@@ -172,7 +174,12 @@ sub process_file {
 
 	$cur++;
 
-	print $timer->report("\r\e[2KUpdating: %p done, %L elapsed, %E remaining", $cur);
+	if ($show_progress) {
+		print $timer->report(
+			"\r\e[2KUpdating: %p done, %L elapsed, %E remaining",
+			$cur,
+		);
+	}
 
 	&{$code}($file, $path);
 
@@ -229,7 +236,14 @@ sub mkdirs {
 }
 
 sub prepare_db_run {
-	find(\&get_total, $base);
+	my ($dir) = @_;
+	$dir //= $base;
+
+	if (not $show_progress) {
+		return;
+	}
+
+	find(\&get_total, $dir);
 
 	$timer = Time::Progress->new();
 	$timer->attr(
@@ -262,11 +276,11 @@ sub cmd_find_new {
 
 	$new_dir //= $base;
 
-	prepare_db_run();
-
 	if (substr($new_dir, 0, 1) ne '/') {
 		$new_dir = $base . '/' . $new_dir;
 	}
+
+	prepare_db_run($new_dir);
 
 	$find_ref = \&db_find_new;
 	$find_db_write = 0;

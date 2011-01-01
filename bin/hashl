@@ -233,7 +233,7 @@ sub prepare_db_run {
 
 sub cmd_copy {
 	prepare_db_run();
-	$incoming_dir = (@_);
+	($incoming_dir) = @_;
 
 	if (not $incoming_dir) {
 		usage();

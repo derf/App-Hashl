@@ -368,37 +368,33 @@ Actions:
 
 =over
 
+=item B<copy> I<newdir>
+
+Copy all files in the current directory which are not in the database to
+I<Newdir>.
+
+=item B<find-new> [I<directory>]
+
+List all files which are not in the database.  Scans either the current
+directory or I<directory>.
+
+=item B<ignore> [I<directory>]
+
+Add all files in I<directory> (or the current directory) as "ignored" to the
+database.  This means that hashl will save the file's hash and skip matching
+files for B<copy> or B<find-new>.
+
 =item B<info> [I<file>]
 
 Show information on I<file> (or the database, if I<file> is not specified).
-
-=item B<know-file> [I<file>]
-
-When I<file> is specified: Returns true if I<file> (judged by its hash) is
-already in the database, false otherwise.
-
-When used without further arguments: Reads filenames from stdin (one per line)
-and writes those to stdout which are already in the database.
-
-=item B<know-hash> [I<hash>]
-
-Like B<know-file>, but works with file hashes instead.
 
 =item B<list>
 
 List all files and their hashes.
 
-=item B<new-file> [I<file>]
+=item B<list-ignored>
 
-When I<file> is specified: Returns true if I<file> (judged by its hash) is not
-in the database, false otherwise.
-
-When used without further arguments: Reads filenames from stdin (one per line)
-and writes those to stdout which are not in the database.
-
-=item B<new-hash> [I<hash>]
-
-Like B<new-file>, but works with file hashes instead.
+List ignored hashes
 
 =item B<update>
 
@@ -414,6 +410,10 @@ directory.
 =item B<-d>|B<--database> I<dbfile>
 
 Use I<dbfile> instead of F<.hashl.db>
+
+=item B<-n>|B<--no-progress>
+
+Do not show progress information.  Most useful with C<< hashl find-new >>.
 
 =item B<-s>|B<--read-size> I<bytes>
 

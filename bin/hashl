@@ -318,6 +318,12 @@ sub cmd_info {
 }
 
 sub cmd_list {
+	printf(
+		"# hashl v%s   Read Size %d bytes (%d KiB)\n",
+		$VERSION,
+		$db->{'config'}->{'read_size'},
+		$db->{'config'}->{'read_size'} / 1024,
+	);
 	for my $name (sort keys %{$db->{'files'}}) {
 		my $file = $db->{'files'}->{$name};
 		printf("%s %s\n", $file->{'hash'}, $name);

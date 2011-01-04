@@ -175,7 +175,7 @@ sub process_file {
 	$cur++;
 
 	if ($show_progress) {
-		print $timer->report(
+		print STDERR $timer->report(
 			"\r\e[2KUpdating: %p done, %L elapsed, %E remaining",
 			$cur,
 		);

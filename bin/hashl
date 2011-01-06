@@ -140,6 +140,15 @@ sub db_find_new {
 	}
 }
 
+sub db_find_known {
+	my ($file, $path) = @_;
+	my $in_db = file_in_db($path);
+
+	if (defined $in_db) {
+		say "\r\e[2K${file}";
+	}
+}
+
 sub db_info {
 	printf(
 		"Read size: %d bytes (%.f KiB)\n",
@@ -271,6 +280,23 @@ sub cmd_copy {
 	print "\n";
 }
 
+sub cmd_find_known {
+	my ($dir) = @_;
+
+	$dir //= $base;
+
+	if (substr($dir, 0, 1) ne '/') {
+		$dir = $base . '/' . $dir;
+	}
+
+	prepare_db_run($dir);
+
+	$find_ref = \&db_find_known;
+	$find_db_write = 0;
+	find(\&process_file, $dir);
+	print "\n";
+}
+
 sub cmd_find_new {
 	my ($new_dir) = @_;
 
@@ -349,6 +375,7 @@ sub cmd_update {
 
 given ($action) {
 	when ('copy')         { cmd_copy(@ARGV) }
+	when ('find-known')   { cmd_find_known(@ARGV) }
 	when ('find-new')     { cmd_find_new(@ARGV) }
 	when ('ignore')       { cmd_ignore(@ARGV) }
 	when ('info')         { cmd_info(@ARGV) }

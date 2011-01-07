@@ -356,6 +356,10 @@ sub cmd_list {
 	}
 }
 
+sub cmd_list_files {
+	say join("\n", sort keys %{$db->{'files'}});
+}
+
 sub cmd_list_ignored {
 	if (exists $db->{'ignored'}->{'hashes'}) {
 		for my $hash (@{$db->{'ignored'}->{'hashes'}}) {
@@ -380,6 +384,7 @@ given ($action) {
 	when ('ignore')       { cmd_ignore(@ARGV) }
 	when ('info')         { cmd_info(@ARGV) }
 	when ('list')         { cmd_list(@ARGV) }
+	when ('list-files')   { cmd_list_files(@ARGV) }
 	when ('list-ignored') { cmd_list_ignored(@ARGV) }
 	when ('update')       { cmd_update(@ARGV) }
 	default { usage() }

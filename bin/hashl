@@ -427,6 +427,11 @@ Actions:
 Copy all files in the current directory which are not in the database to
 I<Newdir>.
 
+=item B<find-known> [I<directory>]
+
+List all files which are already in the database.  Scans either the current
+directory or I<directory>.
+
 =item B<find-new> [I<directory>]
 
 List all files which are not in the database.  Scans either the current
@@ -444,7 +449,11 @@ Show information on I<file> (or the database, if I<file> is not specified).
 
 =item B<list>
 
-List all files and their hashes.
+List all files and their hashes.  The list format is C<< hash size file >>.
+
+=item B<list-files>
+
+List all filenames, one file per line.
 
 =item B<list-ignored>
 

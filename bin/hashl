@@ -75,13 +75,13 @@ sub get_total {
 }
 
 sub si_size {
-	my @post = ('', 'ki', 'Mi', 'Gi', 'Ti');
+	my @post = (' ', 'k', 'M', 'G', 'T');
 	my $bytes = shift;
 	while ($bytes > 1024) {
 		$bytes /= 1024;
 		shift @post;
 	}
-	return sprintf("%5.1f%sB", $bytes, $post[0]);
+	return sprintf("%5.1f%s", $bytes, $post[0]);
 }
 
 sub drop_deleted {
@@ -161,9 +161,9 @@ sub db_find_known {
 
 sub db_info {
 	printf(
-		"Read size: %d bytes (%.f KiB)\n",
+		"Read size: %d bytes (%s)\n",
 		$db->{'config'}->{'read_size'},
-		$db->{'config'}->{'read_size'} / 1024,
+		si_size($db->{'config'}->{'read_size'}),
 	);
 }
 
@@ -171,9 +171,10 @@ sub file_info {
 	my ($file) = @_;
 
 	printf(
-		"File: %s\nSize: %d bytes\nHash: %s\n",
+		"File: %s\nSize: %d bytes (%s)\nHash: %s\n",
 		$file,
 		$db->{'files'}->{$file}->{'size'},
+		si_size($db->{'files'}->{$file}->{'size'}),
 		$db->{'files'}->{$file}->{'hash'},
 	);
 }
@@ -355,15 +356,15 @@ sub cmd_info {
 
 sub cmd_list {
 	printf(
-		"# hashl v%s   Read Size %d bytes (%d KiB)\n",
+		"# hashl v%s   Read Size %d bytes (%s)\n",
 		$VERSION,
 		$db->{'config'}->{'read_size'},
-		$db->{'config'}->{'read_size'} / 1024,
+		si_size($db->{'config'}->{'read_size'}),
 	);
 	for my $name (sort keys %{$db->{'files'}}) {
 		my $file = $db->{'files'}->{$name};
 		printf(
-			"%s %-8s %s\n",
+			"%s %-6s %s\n",
 			$file->{'hash'},
 			si_size($file->{'size'}),
 			$name

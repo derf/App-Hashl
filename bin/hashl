@@ -74,6 +74,16 @@ sub get_total {
 	}
 }
 
+sub si_size {
+	my @post = ('', 'ki', 'Mi', 'Gi', 'Ti');
+	my $bytes = shift;
+	while ($bytes > 1024) {
+		$bytes /= 1024;
+		shift @post;
+	}
+	return sprintf("%5.1f%sB", $bytes, $post[0]);
+}
+
 sub drop_deleted {
 	for my $file (keys %{$db->{'files'}}) {
 		if (! -e $file) {
@@ -352,7 +362,12 @@ sub cmd_list {
 	);
 	for my $name (sort keys %{$db->{'files'}}) {
 		my $file = $db->{'files'}->{$name};
-		printf("%s %s\n", $file->{'hash'}, $name);
+		printf(
+			"%s %-8s %s\n",
+			$file->{'hash'},
+			si_size($file->{'size'}),
+			$name
+		);
 	}
 }
 

@@ -478,7 +478,7 @@ Use I<dbfile> instead of F<.hashl.db>
 
 Do not show progress information.  Most useful with C<< hashl find-new >>.
 
-=item B<-s>|B<--read-size> I<bytes>
+=item B<-s>|B<--read-size> I<kibibytes>
 
 Change size of the part of each file which is hashed.  By default, B<hashl>
 hashes the first 4 MiB.  Note that this option only makes sense for C<< hashl

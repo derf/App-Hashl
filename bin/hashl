@@ -31,7 +31,7 @@ my $VERSION = '0.1';
 
 my $db;
 
-STDOUT->autoflush(1);
+STDERR->autoflush(1);
 
 GetOptions(
 	'd|database=s'  => \$db_file,

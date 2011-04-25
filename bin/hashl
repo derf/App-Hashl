@@ -385,6 +385,7 @@ sub cmd_list_ignored {
 }
 
 sub cmd_update {
+	drop_deleted();
 	prepare_db_run();
 	$find_ref = \&db_update;
 	$find_db_write = 1;

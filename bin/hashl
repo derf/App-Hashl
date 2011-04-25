@@ -81,7 +81,7 @@ sub si_size {
 		$bytes /= 1024;
 		shift @post;
 	}
-	return sprintf("%5.1f%s", $bytes, $post[0]);
+	return sprintf("%6.1f%s", $bytes, $post[0]);
 }
 
 sub drop_deleted {
@@ -364,7 +364,7 @@ sub cmd_list {
 	for my $name (sort keys %{$db->{'files'}}) {
 		my $file = $db->{'files'}->{$name};
 		printf(
-			"%s %-6s %s\n",
+			"%s %-7s %s\n",
 			$file->{'hash'},
 			si_size($file->{'size'}),
 			$name

@@ -48,7 +48,7 @@ my $action = shift;
 sub usage {
 	die(<<"EOF");
 Usage: $0 [options] <update|list|info|...> [args]
-See 'perldoc -F $0' (or 'man $0' if it is properly installed)
+See 'perldoc -F $0' (or 'man hashl' if it is properly installed)
 EOF
 
 }

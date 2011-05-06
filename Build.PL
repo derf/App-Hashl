@@ -17,6 +17,7 @@ my $build = Module::Build->new(
 		'perl' => '5.10.0',
 		'autodie' => 0,
 		'Digest::SHA' => 0,
+		'File::Copy' => 0,
 		'File::Find' => 0,
 		'Getopt::Long' => 0,
 		'IO::Handle' => 0,

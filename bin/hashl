@@ -37,6 +37,7 @@ GetOptions(
 	'd|database=s'  => \$db_file,
 	'n|no-progress' => sub { $show_progress = 0 },
 	's|read-size=i' => sub { $read_size = $_[1] * 1024 },
+	'V|version'     => sub { say "hashl version ${VERSION}"; exit 0 },
 ) or usage();
 
 if (substr($db_file, 0, 1) ne '/') {
@@ -484,6 +485,10 @@ Do not show progress information.  Most useful with C<< hashl find-new >>.
 Change size of the part of each file which is hashed.  By default, B<hashl>
 hashes the first 4 MiB.  Note that this option only makes sense when using C<<
 hashl update >> to create a new database.
+
+=item B<-V>|B<--version>
+
+Print version information.
 
 =back
 

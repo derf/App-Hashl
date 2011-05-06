@@ -1,19 +1,28 @@
-hashl - Hash parts of files, use that for duplicate avoidance
+hashl - Create database with partial file hashes, check if other files are in it
+--------------------------------------------------------------------------------
 
-Requires:
- - perl version 5.10 or newer
- - The perl modules Digest::SHA and Time::Progress
+* <http://derf.homelinux.org/projects/hashl/>
+
+Dependencies
+------------
+
+ * perl version 5.10 or newer
+ * Digest::SHA
+ * Time::Progress
 
 Installation
+------------
 
-> perl Build.PL
-> ./Build
-> ./Build test
-> sudo ./Build install
+$ perl Build.PL
+$ perl Build
+$ sudo perl Build install
 
-See also the Module::Build documentation.
+You can then run 'man hashl' for more information.
 
-Extra modules required for testing:
- - Test::Compile
- - Test::More
- - Test::Pod
+Testing
+-------
+
+$ perl Build test
+
+Note that this will require the Test::More, Test::Compile and Test::Pod
+modules.

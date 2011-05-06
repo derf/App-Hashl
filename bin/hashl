@@ -426,7 +426,7 @@ Actions:
 =item B<copy> I<newdir>
 
 Copy all files in the current directory which are not in the database to
-I<Newdir>.
+I<newdir>.
 
 =item B<find-known> [I<directory>]
 
@@ -458,7 +458,7 @@ List all filenames, one file per line.
 
 =item B<list-ignored>
 
-List ignored hashes
+List ignored hashes.
 
 =item B<update>
 
@@ -482,8 +482,8 @@ Do not show progress information.  Most useful with C<< hashl find-new >>.
 =item B<-s>|B<--read-size> I<kibibytes>
 
 Change size of the part of each file which is hashed.  By default, B<hashl>
-hashes the first 4 MiB.  Note that this option only makes sense for C<< hashl
-update >> to create a new database.
+hashes the first 4 MiB.  Note that this option only makes sense when using C<<
+hashl update >> to create a new database.
 
 =back
 
@@ -505,7 +505,7 @@ None, so far
 
 =head1 BUGS AND LIMITATIONS
 
-Unknown.  This is alpha software.
+Unknown.  This is beta software.
 
 =head1 EXAMPLES
 

@@ -51,7 +51,7 @@ sub si_size {
 	my ($self, $bytes) = @_;
 	my @post = (' ', qw(k M G T));
 
-	while ($bytes > 1024) {
+	while ($bytes >= 1024) {
 		$bytes /= 1024;
 		shift @post;
 	}

@@ -11,8 +11,7 @@ my $build = Module::Build->new(
 		'Test::Compile' => 0,
 		'Test::Pod' => 0,
 	},
-	dist_name => 'hashl',
-	dist_version_from => 'bin/hashl',
+	module_name => 'App::Hashl',
 	license => 'unrestricted',
 	requires => {
 		'perl' => '5.10.0',
@@ -26,5 +25,6 @@ my $build = Module::Build->new(
 		'Time::Progress' => 0,
 	},
 	script_files => 'bin/',
+	sign => 1,
 );
 $build->create_build_script();

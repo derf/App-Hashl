@@ -7,29 +7,29 @@ use warnings;
 use 5.010;
 use autodie;
 
+use App::Hashl;
 use Cwd;
 use Digest::SHA qw(sha1_hex);
 use File::Copy;
 use File::Find;
 use Getopt::Long;
 use IO::Handle;
-use Storable qw(nstore retrieve);
 use Time::Progress;
 
 my $base = getcwd();
 my $rel_paths = 1;
-my $read_size = (2 ** 20) * 4; # 4 MiB
 my $db_file = '.hashl.db';
 my $total = 0;
 my $cur = 0;
 my $show_progress = 1;
 my $timer;
 my $incoming_dir;
+my $read_size;
 my ($find_ref, $find_db_write);
 
-my $VERSION = '0.1';
+my $hashl;
 
-my $db;
+my $VERSION = '0.1';
 
 STDERR->autoflush(1);
 
@@ -59,13 +59,12 @@ if (not defined $action) {
 }
 
 if (-r $db_file) {
-	$db = retrieve($db_file);
-	$read_size = $db->{'config'}->{'read_size'};
+	$hashl = App::Hashl->new_from_file($db_file);
 }
 else {
-	$db->{'config'} = {
+	$hashl = App::Hashl->new(
 		read_size => $read_size,
-	}
+	);
 }
 
 sub get_total {
@@ -75,20 +74,10 @@ sub get_total {
 	}
 }
 
-sub si_size {
-	my @post = (' ', 'k', 'M', 'G', 'T');
-	my $bytes = shift;
-	while ($bytes > 1024) {
-		$bytes /= 1024;
-		shift @post;
-	}
-	return sprintf("%6.1f%s", $bytes, $post[0]);
-}
-
 sub drop_deleted {
-	for my $file (keys %{$db->{'files'}}) {
+	for my $file ($hashl->files()) {
 		if (! -e $file) {
-			delete $db->{'files'}->{$file};
+			$hashl->delete_file($file);
 		}
 	}
 }
@@ -104,58 +93,18 @@ sub copy_file {
 	copy($file, "${to}/${base}");
 }
 
-sub hash_file {
-	my ($file) = @_;
-	my ($fh, $data);
-
-	open($fh, '<', $file);
-	binmode($fh);
-	read($fh, $data, $read_size);
-	close($fh);
-
-	return sha1_hex($data);
-}
-
-sub hash_in_db {
-	my ($hash) = @_;
-
-	if ($db->{'ignored'}->{'hashes'}) {
-		for my $ihash (@{$db->{'ignored'}->{'hashes'}}) {
-			if ($hash eq $ihash) {
-				return '// ignored';
-			}
-		}
-	}
-
-	for my $name (keys %{$db->{'files'}}) {
-		my $file = $db->{'files'}->{$name};
-
-		if ($file->{'hash'} eq $hash) {
-			return $name;
-		}
-	}
-	return undef;
-}
-
-sub file_in_db {
-	my ($file) = @_;
-
-	return hash_in_db(hash_file($file));
-}
-
 sub db_find_new {
 	my ($file, $path) = @_;
 
-	if (not defined file_in_db($path)) {
+	if (not $hashl->file_in_db($path)) {
 		say "\r\e[2K${file}";
 	}
 }
 
 sub db_find_known {
 	my ($file, $path) = @_;
-	my $in_db = file_in_db($path);
 
-	if (defined $in_db) {
+	if ($hashl->file_in_db($path)) {
 		say "\r\e[2K${file}";
 	}
 }
@@ -163,8 +112,8 @@ sub db_find_known {
 sub db_info {
 	printf(
 		"Read size: %d bytes (%s)\n",
-		$db->{'config'}->{'read_size'},
-		si_size($db->{'config'}->{'read_size'}),
+		$hashl->read_size(),
+		$hashl->si_size($hashl->read_size),
 	);
 }
 
@@ -174,9 +123,9 @@ sub file_info {
 	printf(
 		"File: %s\nSize: %d bytes (%s)\nHash: %s\n",
 		$file,
-		$db->{'files'}->{$file}->{'size'},
-		si_size($db->{'files'}->{$file}->{'size'}),
-		$db->{'files'}->{$file}->{'hash'},
+		$hashl->file($file)->{size},
+		$hashl->si_size($hashl->file($file)->{size}),
+		$hashl->files($file)->{hash},
 	);
 }
 
@@ -205,7 +154,7 @@ sub process_file {
 	&{$code}($file, $path);
 
 	if ($write and (($cur % 100) == 0)) {
-		nstore($db, $db_file);
+		$hashl->save($db_file);
 	}
 }
 
@@ -213,34 +162,33 @@ sub db_update {
 	my ($file, $path) = @_;
 	my ($size, $mtime) = (stat($path))[7,9];
 
-	if (exists($db->{'files'}->{$file}) and
-			$db->{'files'}->{$file}->{'mtime'} == $mtime and
-			$db->{'files'}->{$file}->{'size'} == $size ) {
+	if ($hashl->file($file) and
+			$hashl->file($file)->{mtime} == $mtime and
+			$hashl->file($file)->{size} == $size ) {
 		return;
 	}
 
-	$db->{'files'}->{$file} = {
-		hash => hash_file($path),
+	$hashl->add_file($file, {
+		hash => $hashl->hash_file($path),
 		mtime => $mtime,
 		size => $size,
-	};
+	});
 }
 
 sub db_ignore {
 	my ($file, $path) = @_;
-	my $hash = hash_file($path);
 
-	if (hash_in_db($hash)) {
+	if ($hashl->file_in_db($path)) {
 		return;
 	}
 
-	push(@{$db->{'ignored'}->{'hashes'}}, $hash);
+	$hashl->ignore($path);
 }
 
 sub db_copy {
 	my ($file, $path) = @_;
 
-	if (not defined file_in_db($path)) {
+	if (not $hashl->file_in_db($path)) {
 		copy_file($path, $incoming_dir);
 	}
 }
@@ -340,7 +288,7 @@ sub cmd_ignore {
 	$find_ref = \&db_ignore;
 	$find_db_write = 1;
 	find(\&process_file, $base);
-	nstore($db, $db_file);
+	$hashl->save($db_file);
 	print "\n";
 }
 
@@ -359,29 +307,27 @@ sub cmd_list {
 	printf(
 		"# hashl v%s   Read Size %d bytes (%s)\n",
 		$VERSION,
-		$db->{'config'}->{'read_size'},
-		si_size($db->{'config'}->{'read_size'}),
+		$hashl->read_size(),
+		$hashl->si_size($hashl->read_size()),
 	);
-	for my $name (sort keys %{$db->{'files'}}) {
-		my $file = $db->{'files'}->{$name};
+	for my $name ($hashl->files()) {
+		my $file = $hashl->file($name);
 		printf(
 			"%s %-7s %s\n",
-			$file->{'hash'},
-			si_size($file->{'size'}),
+			$file->{hash},
+			$hashl->si_size($file->{size}),
 			$name
 		);
 	}
 }
 
 sub cmd_list_files {
-	say join("\n", sort keys %{$db->{'files'}});
+	say join("\n", $hashl->files());
 }
 
 sub cmd_list_ignored {
-	if (exists $db->{'ignored'}->{'hashes'}) {
-		for my $hash (@{$db->{'ignored'}->{'hashes'}}) {
-			say $hash;
-		}
+	for my $hash ($hashl->ignored()) {
+		say $hash;
 	}
 }
 
@@ -392,7 +338,7 @@ sub cmd_update {
 	$find_db_write = 1;
 	find(\&process_file, $base);
 	print "\n";
-	nstore($db, $db_file);
+	$hashl->save($db_file);
 }
 
 given ($action) {

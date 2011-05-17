@@ -162,17 +162,12 @@ sub db_update {
 	my ($file, $path) = @_;
 	my ($size, $mtime) = (stat($path))[7,9];
 
-	if ($hashl->file($file) and
-			$hashl->file($file)->{mtime} == $mtime and
-			$hashl->file($file)->{size} == $size ) {
-		return;
-	}
-
-	$hashl->add_file($file, {
-		hash => $hashl->hash_file($path),
+	$hashl->add_file(
+		file => $file,
 		mtime => $mtime,
+		path => $path,
 		size => $size,
-	});
+	);
 }
 
 sub db_ignore {

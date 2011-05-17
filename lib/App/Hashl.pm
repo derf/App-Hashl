@@ -10,6 +10,24 @@ use Storable qw(nstore retrieve);
 
 my $VERSION = '0.1';
 
+=head1 NAME
+
+App::Hashl - Partially hash files, check if files are equal etc.
+
+=head1 SYNOPSIS
+
+    use App::Hashl;
+
+    my $hashl = App::Hashl->new();
+    # or: App::Hashl->new_from_file($database_file);
+
+    for my $file (@files) {
+        $hashl->add_file($file, {
+            hash
+
+=cut
+
+
 sub new {
 	my ($obj, %conf) = @_;
 	my $ref = {
@@ -101,8 +119,21 @@ sub files {
 }
 
 sub add_file {
-	my ($self, $name, $data) = @_;
-	$self->{files}->{$name} = $data;
+	my ($self, %data) = @_;
+	my $file = $data{file};
+	my $path = $data{path};
+
+	if ($self->file($file) and
+			$self->file($file)->{mtime} == $data{mtime} and
+			$self->file($file)->{size} == $data{size} ) {
+		return;
+	}
+
+	$self->{files}->{$file} = {
+		hash  => $self->hash_file($file),
+		mtime => $data{mtime},
+		size  => $data{size},
+	};
 }
 
 sub ignored {

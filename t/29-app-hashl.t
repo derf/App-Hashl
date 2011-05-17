@@ -3,9 +3,11 @@ use strict;
 use warnings;
 use 5.010;
 
-use Test::More tests => 13;
+use Test::More tests => 22;
 
 use_ok('App::Hashl');
+
+my $IGNORED = '// ignored';
 
 my $hashl = App::Hashl->new();
 isa_ok($hashl, 'App::Hashl');
@@ -26,5 +28,39 @@ is($hashl->file_in_db('t/in/4'), undef, 'file not in db');
 is_deeply([$hashl->files()], [], 'no files in empty db');
 is_deeply([$hashl->ignored()], [], 'no ignored files in empty db');
 
-ok($hashl->ignore('hash123'), 'ignore hash');
-is_deeply([$hashl->ignored()], ['hash123'], 'ignore hash');
+my $test_hash = $hashl->hash_file('t/in/4');
+ok($hashl->add_file(
+		file => 't/in/4',
+		path => 't/in/4',
+		mtime => 123,
+		size => 4,
+	),
+	'Add new file'
+);
+is_deeply($hashl->file('t/in/4'),
+	{
+		hash => $test_hash,
+		size => 4,
+		mtime => 123,
+	},
+	'hashl->file okay'
+);
+
+ok($hashl->file_in_db('t/in/4'), 'file is now in db');
+ok($hashl->hash_in_db($test_hash), 'hash is in db');
+
+ok($hashl->ignore('t/in/4'), 'ignore file');
+is($hashl->file_in_db('t/in/4'), $IGNORED, 'file no longer in db');
+
+is_deeply([$hashl->ignored()], [$test_hash], 'file is ignored');
+
+ok($hashl->save('t/in/hashl.db'), 'save db');
+
+undef $hashl;
+
+$hashl = App::Hashl->new_from_file('t/in/hashl.db');
+isa_ok($hashl, 'App::Hashl');
+unlink('t/in/hashl.db');
+
+is($hashl->file_in_db('t/in/4'), $IGNORED, 'file still ignored');
+is_deeply([$hashl->files()], [], 'no files in db');

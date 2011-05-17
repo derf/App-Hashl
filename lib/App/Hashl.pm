@@ -149,7 +149,8 @@ sub ignored {
 sub ignore {
 	my ($self, $file) = @_;
 
-	push(@{ $self->{ignored}->{hashes} }, $file);
+	$self->delete_file($file);
+	push(@{ $self->{ignored}->{hashes} }, $self->hash_file($file));
 }
 
 sub save {

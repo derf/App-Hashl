@@ -128,12 +128,8 @@ Otherwise, returns undef.
 sub hash_in_db {
 	my ($self, $hash) = @_;
 
-	if ($self->{ignored}->{hashes}) {
-		for my $ihash (@{$self->{ignored}->{hashes}}) {
-			if ($hash eq $ihash) {
-				return '// ignored';
-			}
-		}
+	if ($self->{ignored}->{$hash}) {
+		return '// ignored';
 	}
 
 	for my $name ($self->files()) {
@@ -241,8 +237,14 @@ sub add_file {
 		return;
 	}
 
+	my $hash = $self->hash_file($path);
+
+	if ($self->{ignored}->{$hash}) {
+		return;
+	}
+
 	$self->{files}->{$file} = {
-		hash  => $self->hash_file($path),
+		hash  => $hash,
 		mtime => $mtime,
 		size  => $size,
 	};
@@ -256,8 +258,8 @@ Returns a list of all ignored file hashes
 
 sub ignored {
 	my ($self) = @_;
-	if (exists $self->{ignored}->{hashes}) {
-		return @{ $self->{ignored}->{hashes} };
+	if (exists $self->{ignored}) {
+		return keys %{ $self->{ignored} };
 	}
 	else {
 		return ();
@@ -275,7 +277,7 @@ sub ignore {
 	my ($self, $file, $path) = @_;
 
 	$self->delete_file($file);
-	push(@{ $self->{ignored}->{hashes} }, $self->hash_file($path));
+	$self->{ignored}->{ $self->hash_file($path) } = 1;
 }
 
 =item $hashl->save(I<$file>)

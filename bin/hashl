@@ -150,7 +150,7 @@ sub process_file {
 
 	if ($show_progress) {
 		print STDERR $timer->report(
-			"\r\e[Scanning directory: %p done, %L elapsed, %E remaining",
+			"\r\e[2KScanning directory: %p done, %L elapsed, %E remaining",
 			$cur,
 		);
 	}
@@ -280,7 +280,7 @@ sub cmd_ignore {
 
 	$find_ref = \&db_ignore;
 	$find_db_write = 1;
-	find(\&process_file, $base);
+	find(\&process_file, $ign_dir);
 	$hashl->save($db_file);
 	print "\n";
 }

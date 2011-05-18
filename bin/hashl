@@ -119,13 +119,18 @@ sub db_info {
 
 sub file_info {
 	my ($file) = @_;
+	my $entry = $hashl->file($file);
+
+	if (not $entry) {
+		die("No such file in database\n");
+	}
 
 	printf(
 		"File: %s\nSize: %d bytes (%s)\nHash: %s\n",
 		$file,
-		$hashl->file($file)->{size},
-		$hashl->si_size($hashl->file($file)->{size}),
-		$hashl->files($file)->{hash},
+		$entry->{size},
+		$hashl->si_size($entry->{size}),
+		$entry->{hash},
 	);
 }
 

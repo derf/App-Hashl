@@ -239,7 +239,7 @@ sub add_file {
 	}
 
 	$self->{files}->{$file} = {
-		hash  => $self->hash_file($file),
+		hash  => $self->hash_file($path),
 		mtime => $mtime,
 		size  => $size,
 	};

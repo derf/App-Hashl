@@ -178,7 +178,7 @@ sub db_update {
 sub db_ignore {
 	my ($file, $path) = @_;
 
-	$hashl->ignore($path);
+	$hashl->ignore($file, $path);
 }
 
 sub db_copy {

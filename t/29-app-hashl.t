@@ -49,7 +49,7 @@ is_deeply($hashl->file('t/in/4'),
 ok($hashl->file_in_db('t/in/4'), 'file is now in db');
 ok($hashl->hash_in_db($test_hash), 'hash is in db');
 
-ok($hashl->ignore('t/in/4'), 'ignore file');
+ok($hashl->ignore('t/in/4', 't/in/4'), 'ignore file');
 is($hashl->file_in_db('t/in/4'), $IGNORED, 'file no longer in db');
 
 is_deeply([$hashl->ignored()], [$test_hash], 'file is ignored');

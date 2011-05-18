@@ -147,10 +147,10 @@ sub ignored {
 }
 
 sub ignore {
-	my ($self, $file) = @_;
+	my ($self, $file, $path) = @_;
 
 	$self->delete_file($file);
-	push(@{ $self->{ignored}->{hashes} }, $self->hash_file($file));
+	push(@{ $self->{ignored}->{hashes} }, $self->hash_file($path));
 }
 
 sub save {

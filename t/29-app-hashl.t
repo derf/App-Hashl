@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use 5.010;
 
-use Test::More tests => 28;
+use Test::More tests => 31;
 
 use_ok('App::Hashl');
 
@@ -76,3 +76,16 @@ unlink('t/in/hashl.db');
 
 is($hashl->file_in_db('t/in/4'), $IGNORED, 'file still ignored');
 is_deeply([$hashl->files()], [], 'no files in db');
+
+undef $hashl;
+
+my $hash_512 = App::Hashl->new(read_size =>  512)->hash_file('t/in/1k');
+my $hash_1k  = App::Hashl->new(read_size => 1024)->hash_file('t/in/1k');
+my $hash_2k  = App::Hashl->new(read_size => 2048)->hash_file('t/in/1k');
+
+my $hash_1k_half = App::Hashl->new()->hash_file('t/in/1k-firsthalf');
+
+is($hash_1k, $hash_2k,
+	'Same hash for read_size > filesize and read_size == file_size');
+isnt($hash_512, $hash_1k, 'Partial hashing does not hash full file');
+is($hash_512, $hash_1k_half, 'Partial hashing produces correct hash');

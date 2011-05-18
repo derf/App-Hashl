@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use 5.010;
 
-use Test::More tests => 22;
+use Test::More tests => 28;
 
 use_ok('App::Hashl');
 
@@ -48,10 +48,23 @@ is_deeply($hashl->file('t/in/4'),
 ok($hashl->file_in_db('t/in/4'), 'file is now in db');
 ok($hashl->hash_in_db($test_hash), 'hash is in db');
 
+ok($hashl->add_file(
+		file => 't/in/1k',
+		path => 't/in/1k',
+	),
+	'Add another file'
+);
+is_deeply([$hashl->files()], [qw[t/in/1k t/in/4]], 'Both files in list');
+ok($hashl->file_in_db('t/in/1k'), 'file in db');
+ok($hashl->file_in_db('t/in/4'), 'other file in db');
+
 ok($hashl->ignore('t/in/4', 't/in/4'), 'ignore file');
 is($hashl->file_in_db('t/in/4'), $IGNORED, 'file no longer in db');
 
 is_deeply([$hashl->ignored()], [$test_hash], 'file is ignored');
+
+ok($hashl->ignore('t/in/1k', 't/in/1k'), 'ignore other file as well');
+is($hashl->file_in_db('t/in/1k'), $IGNORED, 'file ignored');
 
 ok($hashl->save('t/in/hashl.db'), 'save db');
 

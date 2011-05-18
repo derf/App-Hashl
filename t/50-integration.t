@@ -2,7 +2,6 @@
 use strict;
 use warnings;
 use 5.010;
-use autodie;
 
 use Cwd;
 use Test::Command tests => 6;

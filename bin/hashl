@@ -439,8 +439,6 @@ None, so far
 
 =over
 
-=item * autodie (included with perl E<gt>= 5.10.1)
-
 =item * Digest::SHA
 
 =item * Time::Progress

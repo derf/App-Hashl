@@ -79,7 +79,7 @@ sub new_from_file {
 =item $hashl->si_size(I<$bytes>)
 
 Returns I<bytes> as a human-readable SI-size, such as "1.0k", "50.7M", "2.1G".
-The returned string is always sex characters long.
+The returned string is always six characters long.
 
 =cut
 

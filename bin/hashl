@@ -173,10 +173,6 @@ sub db_update {
 sub db_ignore {
 	my ($file, $path) = @_;
 
-	if ($hashl->file_in_db($path)) {
-		return;
-	}
-
 	$hashl->ignore($path);
 }
 

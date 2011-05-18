@@ -2,7 +2,6 @@ package App::Hashl;
 
 use strict;
 use warnings;
-use autodie;
 use 5.010;
 
 use Digest::SHA qw(sha1_hex);
@@ -106,10 +105,14 @@ sub hash_file {
 	my ($self, $file) = @_;
 	my ($fh, $data);
 
-	open($fh, '<', $file);
-	binmode($fh);
-	read($fh, $data, $self->{config}->{read_size});
-	close($fh);
+	open($fh, '<', $file)
+		or die("Can't open ${file} for reading: $!\n");;
+	binmode($fh)
+		or die("Can't set binmode on ${file}: $!\n");
+	read($fh, $data, $self->{config}->{read_size})
+		or die("Can't read ${file}: $!\n");
+	close($fh)
+		or die("Can't close ${file}: $!\n");
 
 	return sha1_hex($data);
 }

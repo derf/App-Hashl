@@ -29,19 +29,18 @@ is_deeply([$hashl->files()], [], 'no files in empty db');
 is_deeply([$hashl->ignored()], [], 'no ignored files in empty db');
 
 my $test_hash = $hashl->hash_file('t/in/4');
+my ($test_size, $test_mtime) = (stat('t/in/4'))[7,9];
 ok($hashl->add_file(
 		file => 't/in/4',
 		path => 't/in/4',
-		mtime => 123,
-		size => 4,
 	),
 	'Add new file'
 );
 is_deeply($hashl->file('t/in/4'),
 	{
 		hash => $test_hash,
-		size => 4,
-		mtime => 123,
+		size => $test_size,
+		mtime => $test_mtime,
 	},
 	'hashl->file okay'
 );

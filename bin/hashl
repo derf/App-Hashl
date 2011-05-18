@@ -165,13 +165,10 @@ sub process_file {
 
 sub db_update {
 	my ($file, $path) = @_;
-	my ($size, $mtime) = (stat($path))[7,9];
 
 	$hashl->add_file(
 		file => $file,
-		mtime => $mtime,
 		path => $path,
-		size => $size,
 	);
 }
 

@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use 5.010;
 
-use Test::More tests => 31;
+use Test::More tests => 32;
 
 use_ok('App::Hashl');
 
@@ -76,6 +76,13 @@ unlink('t/in/hashl.db');
 
 is($hashl->file_in_db('t/in/4'), $IGNORED, 'file still ignored');
 is_deeply([$hashl->files()], [], 'no files in db');
+
+$hashl->add_file(
+	file => 't/in/1k',
+	path => 't/in/1k',
+);
+
+is_deeply([$hashl->files()], [], 'ignored file not added');
 
 undef $hashl;
 

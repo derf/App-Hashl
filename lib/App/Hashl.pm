@@ -202,7 +202,7 @@ Returns a list of all file names in the database
 
 sub files {
 	my ($self) = @_;
-	return sort keys %{ $self->{files} };
+	return keys %{ $self->{files} };
 }
 
 =item $hashl->add_file(I<%data>)

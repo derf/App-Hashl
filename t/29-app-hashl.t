@@ -54,7 +54,7 @@ ok($hashl->add_file(
 	),
 	'Add another file'
 );
-is_deeply([$hashl->files()], [qw[t/in/1k t/in/4]], 'Both files in list');
+is_deeply([sort $hashl->files()], [qw[t/in/1k t/in/4]], 'Both files in list');
 ok($hashl->file_in_db('t/in/1k'), 'file in db');
 ok($hashl->file_in_db('t/in/4'), 'other file in db');
 

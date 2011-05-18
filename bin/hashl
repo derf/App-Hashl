@@ -303,7 +303,7 @@ sub cmd_list {
 		$hashl->read_size(),
 		$hashl->si_size($hashl->read_size()),
 	);
-	for my $name ($hashl->files()) {
+	for my $name (sort $hashl->files()) {
 		my $file = $hashl->file($name);
 		printf(
 			"%s %-7s %s\n",
@@ -315,7 +315,7 @@ sub cmd_list {
 }
 
 sub cmd_list_files {
-	say join("\n", $hashl->files());
+	say join("\n", sort $hashl->files());
 }
 
 sub cmd_list_ignored {

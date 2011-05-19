@@ -65,6 +65,14 @@ else {
 	);
 }
 
+$SIG{INT} = \&quit_save_db;
+$SIG{TERM} = \&quit_save_db;
+
+sub quit_save_db {
+	$hashl->save($db_file);
+	exit 0;
+}
+
 sub get_total {
 	my $file = $File::Find::name;
 	if (-f $file and not -l $file and $file ne $db_file) {
@@ -157,7 +165,7 @@ sub process_file {
 
 	&{$code}($file, $path);
 
-	if ($write and (($cur % 100) == 0)) {
+	if ($write and (($cur % 5000) == 0)) {
 		$hashl->save($db_file);
 	}
 }

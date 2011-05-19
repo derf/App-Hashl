@@ -1,7 +1,9 @@
 git HEAD
 
     * The internal representation of ignored hashes was changed
-    * "hashl update" no longer re-adds ignored (but existing) files
+    * hashl update no longer re-adds ignored (but existing) files
+    * hashl update now saves its state when being interrupted
+      (sigint/sigterm)
 
 hashl 0.1 - Fri May 06 2011
 

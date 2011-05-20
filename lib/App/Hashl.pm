@@ -25,7 +25,9 @@ sub new {
 
 sub new_from_file {
 	my ( $obj, $file ) = @_;
+
 	my $ref = retrieve($file);
+
 	return bless( $ref, $obj );
 }
 
@@ -100,7 +102,7 @@ sub delete_file {
 
 	delete $self->{files}->{$name};
 
-	return;
+	return 1;
 }
 
 sub files {
@@ -216,8 +218,8 @@ The returned string is always six characters long.
 
 =item $hashl->hash_file(I<$file>)
 
-Returns the SHA1 hash of the first n bytes (as configured via B<read_size>) of
-I<file>
+Returns the SHA1 hash of the first few bytes (as configured via B<read_size>) of
+I<file>.  Dies if I<file> cannot be read.
 
 =item $hashl->hash_in_db(I<$hash>)
 
@@ -241,15 +243,17 @@ Returns a hashref describing the file. The layout is as follows:
 
     hash => file's hash,
     mtime => mtime as UNIX timestamp,
-    size => file size in bytes,
+    size => file size in bytes
+
+If I<name> does not exist in the database, returns undef.
 
 =item $hashl->delete_file(I<$name>)
 
-Remove the file from the database
+Remove the file from the database.
 
 =item $hashl->files()
 
-Returns a list of all file names in the database
+Returns a list of all file names in the database.
 
 =item $hashl->add_file(I<%data>)
 
@@ -270,9 +274,12 @@ Full path to the file
 If the file already is in the database, it is only updated if both the file
 size and the mtime have changed.
 
+Returns true if the file was actually added to the database, false if it is
+ignored or already present (and up-to-date).
+
 =item $hashl->ignored()
 
-Returns a list of all ignored file hashes
+Returns a list of all ignored file hashes.
 
 =item $hashl->ignore(I<$file>, I<$path>)
 
@@ -296,7 +303,7 @@ Digest::SHA(3pm);
 
 =head1 BUGS AND LIMITATIONS
 
-FIXME
+There is no B<unignore> method yet.
 
 =head1 AUTHOR
 

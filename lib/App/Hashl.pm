@@ -158,6 +158,14 @@ sub ignore {
 	return 1;
 }
 
+sub unignore {
+	my ( $self, $path ) = @_;
+
+	delete $self->{ignored}->{ $self->hash_file($path) };
+
+	return 1;
+}
+
 sub save {
 	my ( $self, $file ) = @_;
 
@@ -285,6 +293,10 @@ Returns a list of all ignored file hashes.
 
 Removes I<$file> from the database and adds I<$path> to the list of ignored
 file hashes.
+
+=item $hashl->unignore(I<$path>)
+
+Unignore the hash of I<$path>.
 
 =item $hashl->save(I<$file>)
 

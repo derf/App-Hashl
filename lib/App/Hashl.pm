@@ -7,7 +7,7 @@ use 5.010;
 use Digest::SHA qw(sha1_hex);
 use Storable qw(nstore retrieve);
 
-our $VERSION = '0.1';
+our $VERSION = '0.2';
 
 sub new {
 	my ( $obj, %conf ) = @_;
@@ -198,8 +198,8 @@ This manual documents App::Hashl version 0.2
 
 =head1 DESCRIPTION
 
-App::Hashl contains utilities to hash the first n bytes of a file, store and
-recall this, check if another file is already in the database and optionally
+App::Hashl contains utilities to hash the first n bytes of files, store and
+recall them, check if another file is already in the database and optionally
 ignore file hashes.
 
 =head1 METHODS
@@ -316,7 +316,7 @@ retrieved via B<new_from_file>.
 
 =head1 DIAGNOSTICS
 
-FIXME
+None.
 
 =head1 DEPENDENCIES
 
@@ -324,7 +324,7 @@ Digest::SHA(3pm);
 
 =head1 BUGS AND LIMITATIONS
 
-There is no B<unignore> method yet.
+None known.
 
 =head1 AUTHOR
 

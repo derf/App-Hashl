@@ -28,7 +28,7 @@ my ( $find_ref, $find_db_write );
 
 my $hashl;
 
-our $VERSION = '0.1';
+our $VERSION = '0.2';
 
 STDERR->autoflush(1);
 
@@ -410,7 +410,7 @@ B<hashl> [B<-d> I<dbfile>] [B<-s> I<read-size>] I<action> [I<args>]
 
 =head1 VERSION
 
-This manual documents hashl version 0.1
+This manual documents hashl version 0.2
 
 =head1 DESCRIPTION
 

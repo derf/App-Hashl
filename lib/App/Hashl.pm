@@ -282,6 +282,10 @@ relateve file name to store in the database
 
 Full path to the file
 
+=item B<uningnore> => B<0>|B<1>
+
+If true: do not skip ignored files, unignore and re-add them instead
+
 =back
 
 If the file already is in the database, it is only updated if both the file

@@ -7,7 +7,6 @@ use Module::Build;
 my $build = Module::Build->new(
 	build_requires => {
 		'Test::More' => 0,
-		'Test::Command' => 0,
 		'Test::Compile' => 0,
 		'Test::Pod' => 0,
 	},

@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use 5.010;
 
-use Test::More tests => 35;
+use Test::More tests => 38;
 
 use_ok('App::Hashl');
 
@@ -84,8 +84,19 @@ $hashl->add_file(
 
 is_deeply([$hashl->files()], [], 'ignored file not added');
 
-$hashl->unignore('t/in/1k');
+$hashl->unignore($hashl->hash_file('t/in/1k'));
 is_deeply([$hashl->ignored()], [$test_hash], 'unignore worked');
+
+ok(
+	$hashl->add_file(
+		file => 't/in/4',
+		path => 't/in/4',
+		unignore => 1,
+	),
+	'Forcefully re-add file to db (unignore => 1)'
+);
+is_deeply([$hashl->ignored()], [], 'add(unignore => 1) unignore worked');
+is_deeply([$hashl->files()], ['t/in/4'], 'add(unignore => 1) add worked');
 
 ok(
 	$hashl->add_file(

@@ -14,6 +14,7 @@ use Getopt::Long;
 use IO::Handle;
 use Time::Progress;
 
+my $add_unignore  = 0;
 my $base          = getcwd();
 my $rel_paths     = 1;
 my $db_file       = '.hashl.db';
@@ -33,6 +34,7 @@ STDERR->autoflush(1);
 
 GetOptions(
 	'd|database=s'  => \$db_file,
+	'f|force'       => \$add_unignore,
 	'n|no-progress' => sub { $show_progress = 0 },
 	's|read-size=i' => sub { $read_size = $_[1] * 1024 },
 	'V|version'     => sub { say "hashl version ${VERSION}"; exit 0 },
@@ -186,8 +188,9 @@ sub db_update {
 	my ( $file, $path ) = @_;
 
 	$hashl->add_file(
-		file => $file,
-		path => $path,
+		file     => $file,
+		path     => $path,
+		unignore => $add_unignore,
 	);
 
 	return;
@@ -466,6 +469,11 @@ directory.
 =item B<-d>|B<--database> I<dbfile>
 
 Use I<dbfile> instead of F<.hashl.db>
+
+=item B<-f>|B<--force>
+
+For use with C<< hashl add >>: If there are ignored files in the directory,
+unignore and add them.
 
 =item B<-n>|B<--no-progress>
 

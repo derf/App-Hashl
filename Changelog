@@ -4,6 +4,8 @@ git HEAD
     * hashl update no longer re-adds ignored (but existing) files
     * hashl update now saves its state when being interrupted
       (sigint/sigterm)
+    * add hashl -f update - update db, unignore and add any ignored files in
+      the scanned directory
 
 hashl 0.1 - Fri May 06 2011
 

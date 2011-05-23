@@ -112,9 +112,9 @@ sub files {
 }
 
 sub add_file {
-	my ( $self, %data ) = @_;
-	my $file = $data{file};
-	my $path = $data{path};
+	my ( $self, %opt ) = @_;
+	my $file = $opt{file};
+	my $path = $opt{path};
 	my ( $size, $mtime ) = ( stat($path) )[ 7, 9 ];
 
 	if (    $self->file($file)
@@ -127,7 +127,12 @@ sub add_file {
 	my $hash = $self->hash_file($path);
 
 	if ( $self->{ignored}->{$hash} ) {
-		return;
+		if ( $opt{unignore} ) {
+			$self->unignore($hash);
+		}
+		else {
+			return;
+		}
 	}
 
 	$self->{files}->{$file} = {
@@ -159,9 +164,9 @@ sub ignore {
 }
 
 sub unignore {
-	my ( $self, $path ) = @_;
+	my ( $self, $hash ) = @_;
 
-	delete $self->{ignored}->{ $self->hash_file($path) };
+	delete $self->{ignored}->{$hash};
 
 	return 1;
 }

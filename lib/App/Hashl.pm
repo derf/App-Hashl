@@ -282,7 +282,7 @@ relateve file name to store in the database
 
 Full path to the file
 
-=item B<uningnore> => B<0>|B<1>
+=item B<unignore> => B<0>|B<1>
 
 If true: do not skip ignored files, unignore and re-add them instead
 

@@ -1,4 +1,8 @@
-App::Hashl 0.2 - Mon May 23 2011
+git HEAD
+
+    * Add "hashl list <regex>" to filter listed files by name
+
+hashl 0.2 - Mon May 23 2011
 
     * The internal representation of ignored hashes was changed
     * hashl update no longer re-adds ignored (but existing) files

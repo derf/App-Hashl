@@ -413,7 +413,7 @@ B<hashl> - Create database with partial file hashes, check if other files are in
 
 =head1 SYNOPSIS
 
-B<hashl> [B<-d> I<dbfile>] [B<-s> I<read-size>] I<action> [I<args>]
+B<hashl> [B<-fn>] [B<-d> I<dbfile>] [B<-s> I<read-size>] I<action> [I<args>]
 
 =head1 VERSION
 

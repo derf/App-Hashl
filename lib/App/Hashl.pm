@@ -47,6 +47,11 @@ sub hash_file {
 	my ( $self, $file ) = @_;
 	my $data;
 
+	# read() fails for empty files
+	if ( ( stat($file) )[7] == 0 ) {
+		return sha1_hex();
+	}
+
 	#<<< perltidy has problems indenting 'or die' with tabs
 
 	open( my $fh, '<', $file )

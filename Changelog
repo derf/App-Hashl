@@ -1,4 +1,4 @@
-git HEAD
+hashl 1.00 - Wed Nov 02 2011
 
     * Add "hashl list <regex>" to filter listed files by name
     * Do not fail when encountering zero-length files

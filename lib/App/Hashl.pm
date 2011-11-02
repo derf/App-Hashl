@@ -7,7 +7,7 @@ use 5.010;
 use Digest::SHA qw(sha1_hex);
 use Storable qw(nstore retrieve);
 
-our $VERSION = '0.2';
+our $VERSION = '1.00';
 
 sub new {
 	my ( $obj, %conf ) = @_;
@@ -199,7 +199,7 @@ App::Hashl - Partially hash files, check if files are equal etc.
 
 =head1 VERSION
 
-This manual documents App::Hashl version 0.2
+This manual documents App::Hashl version 1.00
 
 =head1 DESCRIPTION
 

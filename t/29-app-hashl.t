@@ -106,7 +106,7 @@ ok(
 	'Re-add file to database',
 );
 
-ok($hashl->file_in_db('t/in/1k', 'file in db again'));
+ok($hashl->file_in_db('t/in/1k'), 'file in db again');
 
 undef $hashl;
 

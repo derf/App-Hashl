@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use 5.010;
 
-use Digest::SHA qw(sha1_hex);
+use Digest::SHA;
 use Storable qw(nstore retrieve);
 
 our $VERSION = '1.00';
@@ -46,10 +46,15 @@ sub si_size {
 sub hash_file {
 	my ( $self, $file ) = @_;
 	my $data;
+	my $digest = Digest::SHA->new(1);
 
 	# read() fails for empty files
 	if ( ( stat($file) )[7] == 0 ) {
-		return sha1_hex();
+		return $digest->hexdigest;
+	}
+	if ($self->{config}->{read_size} == 0) {
+		$digest->addfile($file);
+		return $digest->hexdigest;
 	}
 
 	#<<< perltidy has problems indenting 'or die' with tabs
@@ -64,7 +69,8 @@ sub hash_file {
 		or die("Can't close ${file}: $!\n");
 
 	#>>>
-	return sha1_hex($data);
+	$digest->add($data);
+	return $digest->hexdigest;
 }
 
 sub hash_in_db {
@@ -220,7 +226,7 @@ Returns a new B<App::Hashl> object. Accepted parameters are:
 =item B<read_size> => I<bytes>
 
 How many bytes of a file to consider for the hash.  Defaults to 4 MiB (4 *
-2**20 bytes).
+2**20 bytes). 0 means read the whole file.
 
 =back
 

@@ -495,6 +495,9 @@ Change size of the part of each file which is hashed.  By default, B<hashl>
 hashes the first 4 MiB.  Note that this option only makes sense when using C<<
 hashl update >> to create a new database.
 
+A size of 0 (zero) makes hashl read whole files, i.e. turning it into sha1sum
+with a database.
+
 =item B<-V>|B<--version>
 
 Print version information.

@@ -127,9 +127,10 @@ sub db_find_known {
 }
 
 sub db_info {
+	printf( "Database created by hashl v%s\n", $hashl->db_version, );
 	printf(
 		"Read size: %d bytes (%s)\n",
-		$hashl->read_size(), $hashl->si_size( $hashl->read_size ),
+		$hashl->read_size, $hashl->si_size( $hashl->read_size ),
 	);
 
 	return;

@@ -19,6 +19,7 @@ sub new {
 
 	$ref->{config} = \%conf;
 	$ref->{config}->{read_size} //= ( 2**20 ) * 4;    # 4 MiB
+	$ref->{version} = $VERSION;
 
 	return bless( $ref, $obj );
 }
@@ -27,6 +28,10 @@ sub new_from_file {
 	my ( $obj, $file ) = @_;
 
 	my $ref = retrieve($file);
+
+	if ( not defined $ref->{version} ) {
+		$ref->{version} = '1.00';
+	}
 
 	return bless( $ref, $obj );
 }
@@ -52,7 +57,7 @@ sub hash_file {
 	if ( ( stat($file) )[7] == 0 ) {
 		return $digest->hexdigest;
 	}
-	if ($self->{config}->{read_size} == 0) {
+	if ( $self->{config}->{read_size} == 0 ) {
 		$digest->addfile($file);
 		return $digest->hexdigest;
 	}
@@ -100,6 +105,12 @@ sub read_size {
 	my ($self) = @_;
 
 	return $self->{config}->{read_size};
+}
+
+sub db_version {
+	my ($self) = @_;
+
+	return $self->{version};
 }
 
 sub file {

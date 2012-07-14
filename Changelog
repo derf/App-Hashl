@@ -1,3 +1,7 @@
+git HEAD
+
+    * Set read size to 0 (zero) to hash whole files
+
 hashl 1.00 - Wed Nov 02 2011
 
     * Add "hashl list <regex>" to filter listed files by name

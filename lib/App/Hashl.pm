@@ -40,6 +40,10 @@ sub si_size {
 	my ( $self, $bytes ) = @_;
 	my @post = ( q{ }, qw(k M G T) );
 
+	if ($bytes == 0) {
+		return 'infinite';
+	}
+
 	while ( $bytes >= 1024 ) {
 		$bytes /= 1024;
 		shift @post;

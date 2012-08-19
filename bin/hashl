@@ -339,7 +339,7 @@ sub cmd_info {
 		file_info($file);
 	}
 	else {
-		$hashl->db_info();
+		print $hashl->db_info();
 	}
 
 	return;

@@ -12,6 +12,7 @@ use File::Copy;
 use File::Find;
 use Getopt::Long;
 use IO::Handle;
+use List::MoreUtils qw(any);
 use Time::Progress;
 
 my $add_unignore  = 0;
@@ -28,6 +29,7 @@ my $read_size;
 my ( $find_ref, $find_db_write );
 
 my $hashl;
+my @ehashl;
 
 our $VERSION = '1.00';
 
@@ -64,6 +66,16 @@ if ( -r $db_file ) {
 }
 else {
 	$hashl = App::Hashl->new( read_size => $read_size );
+}
+@ehashl = ($hashl);
+
+for my $file (@edb_files) {
+	if (-r $file) {
+		push(@ehashl, App::Hashl->new_from_file($file));
+	}
+	else {
+		die("-e ${file}: database does not exist\n");
+	}
 }
 
 local $SIG{INT}  = \&quit_save_db;
@@ -111,7 +123,7 @@ sub copy_file {
 sub db_find_new {
 	my ( $file, $path ) = @_;
 
-	if ( not $hashl->file_in_db($path) ) {
+	if ( not any { $_->file_in_db($path) } @ehashl ) {
 		say "\r\e[2K${file}";
 	}
 
@@ -121,7 +133,7 @@ sub db_find_new {
 sub db_find_known {
 	my ( $file, $path ) = @_;
 
-	if ( $hashl->file_in_db($path) ) {
+	if ( any { $_->file_in_db($path) } @ehashl ) {
 		say "\r\e[2K${file}";
 	}
 
@@ -425,12 +437,12 @@ I<newdir>.
 
 =item B<find-known> [I<directory>]
 
-List all files which are already in the database.  Scans either the current
+List all files which are already in any database.  Scans either the current
 directory or I<directory>.
 
 =item B<find-new> [I<directory>]
 
-List all files which are not in the database.  Scans either the current
+List all files which are not in any database.  Scans either the current
 directory or I<directory>.
 
 =item B<ignore> [I<directory>]
@@ -472,6 +484,11 @@ directory.
 =item B<-d>|B<--database> I<dbfile>
 
 Use I<dbfile> instead of F<.hashl.db>
+
+=item B<-e>|B<--extra-db> I<dbfile>
+
+Use I<dbfile> in addition to F<.hashl.db> / B<-d>. May be specified
+several times. Does not affect all commands.
 
 =item B<-f>|B<--force>
 

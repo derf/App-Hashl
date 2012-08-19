@@ -19,6 +19,7 @@ my $build = Module::Build->new(
 		'File::Find' => 0,
 		'Getopt::Long' => 0,
 		'IO::Handle' => 0,
+		'List::MoreUtils' => 0,
 		'Storable' => 0,
 		'Time::Progress' => 0,
 	},

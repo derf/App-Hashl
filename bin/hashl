@@ -528,6 +528,8 @@ None, so far
 
 =item * Digest::SHA
 
+=item = List::MoreUtils
+
 =item * Time::Progress
 
 =back

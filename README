@@ -8,6 +8,7 @@ Dependencies
 
  * perl version 5.10 or newer
  * Digest::SHA
+ * List::MoreUtils
  * Time::Progress
 
 Installation

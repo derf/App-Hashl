@@ -70,8 +70,8 @@ else {
 @ehashl = ($hashl);
 
 for my $file (@edb_files) {
-	if (-r $file) {
-		push(@ehashl, App::Hashl->new_from_file($file));
+	if ( -r $file ) {
+		push( @ehashl, App::Hashl->new_from_file($file) );
 	}
 	else {
 		die("-e ${file}: database does not exist\n");
@@ -104,6 +104,21 @@ sub drop_deleted {
 	}
 
 	return;
+}
+
+sub ensure_equal_hash_sizes {
+	for my $i ( 1 .. $#ehashl ) {
+		if ( $ehashl[$i]->read_size != $hashl->read_size ) {
+			printf STDERR (
+				'Cannot list: main database has read size %d, but database'
+				  . " %s has read size %d\n",
+				$hashl->read_size,
+				$edb_files[ $i - 1 ],
+				$ehashl[$i]->read_size
+			);
+			exit 1;
+		}
+	}
 }
 
 sub copy_file {
@@ -212,7 +227,7 @@ sub db_ignore {
 sub db_copy {
 	my ( $file, $path ) = @_;
 
-	if ( not $hashl->file_in_db($path) ) {
+	if ( not any { $_->file_in_db($path) } @ehashl ) {
 		copy_file( $path, $incoming_dir );
 	}
 
@@ -345,38 +360,51 @@ sub cmd_info {
 	return;
 }
 
+sub map_with_prefix {
+	my ( $prefix, @items ) = @_;
+	return map { [ $prefix, $_ ] } @items;
+}
+
 sub cmd_list {
 	my ($re) = @_;
 
+	ensure_equal_hash_sizes();
+
 	printf(
 		"# hashl v%s   Read Size %d bytes (%s)\n",
-		$VERSION, $hashl->read_size(), $hashl->si_size( $hashl->read_size() ),
+		$VERSION, $hashl->read_size, $hashl->si_size( $hashl->read_size ),
 	);
 
-	for my $name ( sort $hashl->files() ) {
-		my $file = $hashl->file($name);
+	for my $pair (
+		sort { $a->[1] cmp $b->[1] }
+		map { map_with_prefix( $_, $_->files ) } @ehashl
+	  )
+	{
+		my ( $db, $name ) = @{$pair};
+		my $file = $db->file($name);
 
 		if ( $re and $name !~ m{$re} ) {
 			next;
 		}
 
 		printf( "%s %-7s %s\n",
-			$file->{hash}, $hashl->si_size( $file->{size} ), $name );
+			$file->{hash}, $db->si_size( $file->{size} ), $name );
 	}
 
 	return;
 }
 
 sub cmd_list_files {
-	say join( "\n", sort $hashl->files() );
+	say join( "\n", sort map { $_->files } @ehashl );
 
 	return;
 }
 
 sub cmd_list_ignored {
-	for my $hash ( $hashl->ignored() ) {
-		say $hash;
-	}
+
+	ensure_equal_hash_sizes();
+
+	say join( "\n", map { $_->ignored } @ehashl );
 
 	return;
 }
@@ -432,7 +460,7 @@ Actions:
 
 =item B<copy> I<newdir>
 
-Copy all files in the current directory which are not in the database to
+Copy all files in the current directory which are not in any database to
 I<newdir>.
 
 =item B<find-known> [I<directory>]
@@ -488,7 +516,10 @@ Use I<dbfile> instead of F<.hashl.db>
 =item B<-e>|B<--extra-db> I<dbfile>
 
 Use I<dbfile> in addition to F<.hashl.db> / B<-d>. May be specified
-several times. Does not affect all commands.
+several times.
+
+Database files specified with this option will be opened read-only and ignored
+by writing actions (such as B<update> or B<ignore>).
 
 =item B<-f>|B<--force>
 
@@ -528,7 +559,7 @@ None, so far
 
 =item * Digest::SHA
 
-=item = List::MoreUtils
+=item * List::MoreUtils
 
 =item * Time::Progress
 

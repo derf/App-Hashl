@@ -21,6 +21,7 @@ my $db_file       = '.hashl.db';
 my $total         = 0;
 my $cur           = 0;
 my $show_progress = 1;
+my @edb_files;
 my $timer;
 my $incoming_dir;
 my $read_size;
@@ -34,6 +35,7 @@ STDERR->autoflush(1);
 
 GetOptions(
 	'd|database=s'  => \$db_file,
+	'e|extra-db=s'  => \@edb_files,
 	'f|force'       => \$add_unignore,
 	'n|no-progress' => sub { $show_progress = 0 },
 	's|read-size=i' => sub { $read_size = $_[1] * 1024 },
@@ -83,7 +85,7 @@ sub get_total {
 }
 
 sub drop_deleted {
-	for my $file ( $hashl->files() ) {
+	for my $file ( $hashl->files ) {
 		if ( not -e $file ) {
 			$hashl->delete_file($file);
 		}
@@ -122,16 +124,6 @@ sub db_find_known {
 	if ( $hashl->file_in_db($path) ) {
 		say "\r\e[2K${file}";
 	}
-
-	return;
-}
-
-sub db_info {
-	printf( "Database created by hashl v%s\n", $hashl->db_version, );
-	printf(
-		"Read size: %d bytes (%s)\n",
-		$hashl->read_size, $hashl->si_size( $hashl->read_size ),
-	);
 
 	return;
 }
@@ -335,7 +327,7 @@ sub cmd_info {
 		file_info($file);
 	}
 	else {
-		db_info();
+		$hashl->db_info();
 	}
 
 	return;
@@ -549,7 +541,7 @@ C<< cd /tmp/mnt/ext; hashl copy /media/videos/incoming >>
 
 Personally, I have all my videos on an external hard disk, which I usually do
 not carry with me.  So, when I get new videos, I put them into F<~/lib/videos>
-on my netboo, and then later copy them to the external disk.  Of course, it
+on my netbook, and then later copy them to the external disk.  Of course, it
 can always happen that I get a movie I already have, or forget to move
 something from F<~/lib/videos> to the external disk, especially since I also
 always have some stuff from the disk in F<~/lib/videos>.

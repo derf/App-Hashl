@@ -107,6 +107,15 @@ sub read_size {
 	return $self->{config}->{read_size};
 }
 
+sub db_info {
+	my ($self) = @_;
+
+	return sprintf(
+		"Database created by hashl v%s\n" . "Read size: %d bytes (%s)\n",
+		$self->db_version, $self->read_size, $self->si_size( $self->read_size ),
+	);
+}
+
 sub db_version {
 	my ($self) = @_;
 

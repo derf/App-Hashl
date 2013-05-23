@@ -1,6 +1,7 @@
 git HEAD
 
     * Set read size to 0 (zero) to hash whole files
+    * Fix find-new and find-known output so it can be piped to other commands
 
 hashl 1.00 - Wed Nov 02 2011
 

@@ -139,7 +139,8 @@ sub db_find_new {
 	my ( $file, $path ) = @_;
 
 	if ( not any { $_->file_in_db($path) } @ehashl ) {
-		say "\r\e[2K${file}";
+		print STDERR "\r\e[2K";
+		say $file;
 	}
 
 	return;
@@ -149,7 +150,8 @@ sub db_find_known {
 	my ( $file, $path ) = @_;
 
 	if ( any { $_->file_in_db($path) } @ehashl ) {
-		say "\r\e[2K${file}";
+		print STDERR "\r\e[2K";
+		say $file;
 	}
 
 	return;

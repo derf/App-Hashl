@@ -24,6 +24,7 @@ my $db_file       = '.hashl.db';
 my $total         = 0;
 my $cur           = 0;
 my $show_progress = 1;
+my $xdev_fsno;
 my @edb_files;
 my $timer;
 my $incoming_dir;
@@ -38,12 +39,13 @@ our $VERSION = '1.00';
 STDERR->autoflush(1);
 
 GetOptions(
-	'd|database=s'  => \$db_file,
-	'e|extra-db=s'  => \@edb_files,
-	'f|force'       => \$add_unignore,
-	'n|no-progress' => sub { $show_progress = 0 },
-	's|read-size=i' => sub { $read_size = $_[1] * 1024 },
-	'V|version'     => sub { say "hashl version ${VERSION}"; exit 0 },
+	'd|database=s'      => \$db_file,
+	'e|extra-db=s'      => \@edb_files,
+	'f|force'           => \$add_unignore,
+	'n|no-progress'     => sub { $show_progress = 0 },
+	's|read-size=i'     => sub { $read_size = $_[1] * 1024 },
+	'V|version'         => sub { say "hashl version ${VERSION}"; exit 0 },
+	'x|one-file-system' => sub { $xdev_fsno = ( stat($base) )[0] },
 ) or usage();
 
 if ( substr( $db_file, 0, 1 ) ne q{/} ) {
@@ -91,7 +93,11 @@ sub quit_save_db {
 sub get_total {
 	my $file = $File::Find::name;
 
-	if ( -f $file and not -l $file and $file ne $db_file ) {
+	if (    -f $file
+		and not -l $file
+		and $file ne $db_file
+		and ( not $xdev_fsno or ( stat($file) )[0] == $xdev_fsno ) )
+	{
 		$total++;
 	}
 
@@ -183,7 +189,11 @@ sub process_file {
 	my $file = $File::Find::name;
 	my $path = $file;
 
-	if ( not -f $file or -l $file or $file eq $db_file ) {
+	if (   not -f $file
+		or -l $file
+		or $file eq $db_file
+		or ( $xdev_fsno and ( stat($file) )[0] != $xdev_fsno ) )
+	{
 		return;
 	}
 
@@ -450,7 +460,7 @@ B<hashl> - Create database with partial file hashes, check if other files are in
 
 =head1 SYNOPSIS
 
-B<hashl> [B<-fn>] [B<-d> I<dbfile>] [B<-s> I<read-size>] I<action> [I<args>]
+B<hashl> [B<-fnx>] [B<-d> I<dbfile>] [B<-s> I<read-size>] I<action> [I<args>]
 
 =head1 VERSION
 
@@ -547,6 +557,12 @@ with a database.
 
 Print version information.
 
+=item B<-x>|B<--one-file-system>
+
+Do not cross filesystem boundaries when processing files. At the time of this
+writing, this may not prevent hashl from recursing into other filesystems,
+but they will never be hashed, copied or otherwise processed.
+
 =back
 
 =head1 EXIT STATUS
@@ -571,7 +587,7 @@ None, so far
 
 =head1 BUGS AND LIMITATIONS
 
-Unknown.  This is beta software.
+Unknown.
 
 =head1 EXAMPLES
 

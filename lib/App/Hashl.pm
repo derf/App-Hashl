@@ -40,7 +40,7 @@ sub si_size {
 	my ( $self, $bytes ) = @_;
 	my @post = ( q{ }, qw(k M G T) );
 
-	if ($bytes == 0) {
+	if ( $bytes == 0 ) {
 		return 'infinite';
 	}
 
@@ -115,11 +115,16 @@ sub db_info {
 	my ($self) = @_;
 
 	return sprintf(
-		"Database created by hashl v%s\n" . "Read size: %d bytes (%s)\n" .
-		"contains: %d file%s and %d ignored hash%s\n",
-		$self->db_version, $self->read_size, $self->si_size( $self->read_size ),
-		scalar($self->files), (scalar($self->files) == 1 ? q{} : 's' ),
-		scalar($self->ignored), (scalar($self->ignored) == 1 ? q{} : 'es' ),
+		"Database created by hashl v%s\n"
+		  . "Read size: %d bytes (%s)\n"
+		  . "contains: %d file%s and %d ignored hash%s\n",
+		$self->db_version,
+		$self->read_size,
+		$self->si_size( $self->read_size ),
+		scalar( $self->files ),
+		( scalar( $self->files ) == 1 ? q{} : 's' ),
+		scalar( $self->ignored ),
+		( scalar( $self->ignored ) == 1 ? q{} : 'es' ),
 	);
 }
 

@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use 5.010;
 
-no if $] >= 5.018, warnings => "experimental::smartmatch";
+no if $] >= 5.018, warnings => 'experimental::smartmatch';
 
 use App::Hashl;
 use Cwd;
@@ -127,6 +127,7 @@ sub ensure_equal_hash_sizes {
 			exit 1;
 		}
 	}
+	return;
 }
 
 sub copy_file {

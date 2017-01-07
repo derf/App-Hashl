@@ -410,11 +410,31 @@ sub cmd_list {
 	return;
 }
 
+sub colorize {
+	my ( $filename, $cmap ) = @_;
+
+	my $filetype = ( split( qr{ [.] }x, $filename ) )[-1];
+	if ( exists $cmap->{$filetype} ) {
+		return sprintf( "\e[%sm%s\e[0m", $cmap->{$filetype}, $filename );
+	}
+	return $filename;
+}
+
 sub cmd_ls {
 	my ($re) = @_;
 	my $now = DateTime->now;
 
 	ensure_equal_hash_sizes();
+
+	my @ls_colors = split( qr{ : }x, $ENV{LS_COLORS} // q{} );
+	my %cmap;
+
+	for my $ls_color (@ls_colors) {
+		if ( $ls_color =~ m{ ^ [*] [.] (?<filetype> [^=]+ ) = (?<color> .+) }x )
+		{
+			$cmap{ $+{filetype} } = $+{color};
+		}
+	}
 
 	for my $pair (
 		sort { $a->[1] cmp $b->[1] }
@@ -439,7 +459,8 @@ sub cmd_ls {
 
 		printf( "%-7s %s %s\n",
 			$db->si_size( $file->{size} ),
-			$dt->strftime($time_format), $name );
+			$dt->strftime($time_format),
+			colorize( $name, \%cmap ) );
 	}
 
 	return;

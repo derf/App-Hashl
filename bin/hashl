@@ -10,6 +10,7 @@ no if $] >= 5.018, warnings => 'experimental::smartmatch';
 
 use App::Hashl;
 use Cwd;
+use DateTime;
 use File::Copy;
 use File::Find;
 use Getopt::Long;
@@ -409,6 +410,41 @@ sub cmd_list {
 	return;
 }
 
+sub cmd_ls {
+	my ($re) = @_;
+	my $now = DateTime->now;
+
+	ensure_equal_hash_sizes();
+
+	for my $pair (
+		sort { $a->[1] cmp $b->[1] }
+		map { map_with_prefix( $_, $_->files ) } @ehashl
+	  )
+	{
+		my ( $db, $name ) = @{$pair};
+		my $file = $db->file($name);
+		my $dt   = DateTime->from_epoch(
+			epoch => $file->{mtime},
+		);
+		my $time_format = '%b %d %H:%M';
+
+ # Date math is hard. So we don't account for leap years (or leap seconds) here.
+		if ( $now->epoch - $dt->epoch >= 31536000 ) {
+			$time_format = '%b %d  %Y';
+		}
+
+		if ( $re and $name !~ m{$re} ) {
+			next;
+		}
+
+		printf( "%-7s %s %s\n",
+			$db->si_size( $file->{size} ),
+			$dt->strftime($time_format), $name );
+	}
+
+	return;
+}
+
 sub cmd_list_files {
 	say join( "\n", sort map { $_->files } @ehashl );
 
@@ -446,6 +482,7 @@ given ($action) {
 	when ('find-new')     { cmd_find_new(@ARGV) }
 	when ('ignore')       { cmd_ignore(@ARGV) }
 	when ('info')         { cmd_info(@ARGV) }
+	when ('ls')           { cmd_ls(@ARGV) }
 	when ('list')         { cmd_list(@ARGV) }
 	when ('list-files')   { cmd_list_files(@ARGV) }
 	when ('list-ignored') { cmd_list_ignored(@ARGV) }

@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use 5.010;
 
-use Test::More tests => 38;
+use Test::More tests => 41;
 
 use_ok('App::Hashl');
 
@@ -21,6 +21,9 @@ is($hashl->read_size(), 512, 'Custom read size set');
 is($hashl->si_size(1023), '1023.0 ', 'si_size 1023 = 1023');
 is($hashl->si_size(1024), '   1.0k', 'si_size 1024 = 1k');
 is($hashl->si_size(2048), '   2.0k', 'si_size 2048 = 2k');
+
+is($hashl->si_size(1024 * 1024), '   1.0M', 'si_size 1024^2 = 1M');
+is($hashl->si_size(0),   'infinite', 'si_size    0 = infinite');
 
 
 is($hashl->hash_in_db('123'), undef, 'hash not in db');
@@ -113,10 +116,13 @@ undef $hashl;
 my $hash_512 = App::Hashl->new(read_size =>  512)->hash_file('t/in/1k');
 my $hash_1k  = App::Hashl->new(read_size => 1024)->hash_file('t/in/1k');
 my $hash_2k  = App::Hashl->new(read_size => 2048)->hash_file('t/in/1k');
+my $hash_inf = App::Hashl->new(read_size =>    0)->hash_file('t/in/1k');
 
 my $hash_1k_half = App::Hashl->new()->hash_file('t/in/1k-firsthalf');
 
 is($hash_1k, $hash_2k,
 	'Same hash for read_size > filesize and read_size == file_size');
+is($hash_1k, $hash_inf,
+	'Same hash for read_size == inf and read_size == file_size');
 isnt($hash_512, $hash_1k, 'Partial hashing does not hash full file');
 is($hash_512, $hash_1k_half, 'Partial hashing produces correct hash');

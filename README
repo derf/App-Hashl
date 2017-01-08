@@ -1,12 +1,13 @@
 hashl - Create database with partial file hashes, check if other files are in it
 --------------------------------------------------------------------------------
 
-* <http://finalrewind.org/projects/hashl/>
+* <https://finalrewind.org/projects/hashl/>
 
 Dependencies
 ------------
 
  * perl version 5.10 or newer
+ * DateTime
  * Digest::SHA
  * List::MoreUtils
  * Time::Progress

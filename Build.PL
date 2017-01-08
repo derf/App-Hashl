@@ -14,6 +14,7 @@ my $build = Module::Build->new(
 	license => 'unrestricted',
 	requires => {
 		'perl' => '5.10.0',
+		'DateTime' => 0,
 		'Digest::SHA' => 0,
 		'File::Copy' => 0,
 		'File::Find' => 0,

@@ -571,6 +571,13 @@ List all filenames, one file per line.
 
 List ignored hashes.
 
+=item B<ls> [I<regex>]
+
+List all files using an B<ls>-style output format.
+
+If I<regex> (a perl regular expression) is specifed, only matching files will
+be listed.
+
 =item B<update>
 
 Update or create hash database.  Iterates over all files below the current

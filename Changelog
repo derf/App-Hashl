@@ -1,8 +1,11 @@
 git HEAD
 
-    * Set read size to 0 (zero) to hash whole files
+    * You can now use -s 0 / --read-size=0 to hash entire files
+    * New option: -e <file> / --extra-db=<file>
+    * New option: -x / --one-file-system
+    * New command: "hashl ls" lists files using an ls-style output format
     * Fix find-new and find-known output so it can be piped to other commands
-    * Add -x / --one-file-system option
+    * New dependencies: DateTime and List::MoreUtils
 
 hashl 1.00 - Wed Nov 02 2011
 

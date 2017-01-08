@@ -35,7 +35,7 @@ my ( $find_ref, $find_db_write );
 my $hashl;
 my @ehashl;
 
-our $VERSION = '1.00';
+our $VERSION = '1.01';
 
 STDERR->autoflush(1);
 
@@ -523,7 +523,7 @@ B<hashl> [B<-fnx>] [B<-d> I<dbfile>] [B<-s> I<read-size>] I<action> [I<args>]
 
 =head1 VERSION
 
-This manual documents hashl version 1.00
+This manual documents hashl version 1.01
 
 =head1 DESCRIPTION
 
@@ -698,7 +698,7 @@ C<< cd ~/lib/video; print -l **/*(.) | hashl -d .argon new-file >>
 
 =head1 AUTHOR
 
-Copyright (C) 2010 by Daniel Friesel E<lt>derf@finalrewind.orgE<gt>
+Copyright (C) 2010-2017 by Daniel Friesel E<lt>derf@finalrewind.orgE<gt>
 
 =head1 LICENSE
 

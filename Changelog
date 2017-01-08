@@ -1,4 +1,4 @@
-git HEAD
+hashl 1.01 - Sun Jan 08 2017
 
     * You can now use -s 0 / --read-size=0 to hash entire files
     * New option: -e <file> / --extra-db=<file>

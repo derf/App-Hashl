@@ -7,7 +7,7 @@ use 5.010;
 use Digest::SHA;
 use Storable qw(nstore retrieve);
 
-our $VERSION = '1.00';
+our $VERSION = '1.01';
 
 sub new {
 	my ( $obj, %conf ) = @_;
@@ -237,7 +237,7 @@ App::Hashl - Partially hash files, check if files are equal etc.
 
 =head1 VERSION
 
-This manual documents App::Hashl version 1.00
+This manual documents App::Hashl version 1.01
 
 =head1 DESCRIPTION
 
@@ -371,7 +371,7 @@ None known.
 
 =head1 AUTHOR
 
-Copyright (C) 2011 by Daniel Friesel E<lt>derf@finalrewind.orgE<gt>
+Copyright (C) 2011-2017 by Daniel Friesel E<lt>derf@finalrewind.orgE<gt>
 
 =head1 LICENSE
 

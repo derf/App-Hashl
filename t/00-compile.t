@@ -5,4 +5,6 @@ use 5.010;
 use Test::More;
 use Test::Compile;
 
-all_pl_files_ok('bin/hashl');
+my $test = Test::Compile->new();
+$test->all_pl_files_ok('bin/hashl');
+$test->done_testing();
